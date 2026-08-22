@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-azure-50: #F0F8FF;
+  --color-azure-100: #E0F0FF;
+  --color-azure-200: #BDE0FE;
+  --color-azure-300: #90C7FE;
+  
+  --color-sapphire-300: #60A5FA;
+  --color-sapphire-400: #3B82F6;
+  --color-sapphire-500: #1D4ED8;
+  --color-sapphire-600: #0047AB;
+  --color-sapphire-700: #003380;
+  --color-sapphire-800: #002255;
+  
+  --color-sky-400: #38BDF8;
+  --color-sky-500: #0EA5E9;
+  --color-sky-600: #0284C7;
+  
+  --color-indigo-800: #1A365D;
+  --color-indigo-900: #0A2558;
+  --color-indigo-950: #071A3D;
+}
+
+@layer base {
+  body {
+    @apply bg-azure-50 text-indigo-950 font-sans antialiased;
+  }
+}
+
