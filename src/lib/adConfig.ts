@@ -29,8 +29,11 @@ export interface AdSlotConfig {
 
 export interface AdSettingsState {
   global_ads_enabled: boolean;
-  adsterra_direct_link: string; // ADSTERRA_DIRECT_LINK (Main Direct Link)
-  vite_adsterra_direct_link: string; // VITE_ADSTERRA_DIRECT_LINK (Fallback / Client Direct Link)
+  adsterra_direct_link: string; // 1. Direct Link / Smartlink URL
+  vite_adsterra_direct_link: string; // Fallback / Client Direct Link
+  adsterra_banner_script?: string; // 2. Banner Ads Script (Header/Top of PostView & CodesList)
+  adsterra_popunder_script?: string; // 3. Popunder Script (Global <head> across all routes)
+  adsterra_social_bar_script?: string; // 4. Social Bar Script (AppLayout floating notification ads)
   slots: Record<AdSlotId, AdSlotConfig>;
 }
 
@@ -44,6 +47,9 @@ export const DEFAULT_AD_SETTINGS: AdSettingsState = {
   global_ads_enabled: true,
   adsterra_direct_link: defaultDirectLink,
   vite_adsterra_direct_link: defaultDirectLink,
+  adsterra_banner_script: '',
+  adsterra_popunder_script: '',
+  adsterra_social_bar_script: '',
   slots: {
     header_banner: {
       id: 'header_banner',
@@ -215,6 +221,9 @@ export function getLocalAdSettings(): AdSettingsState {
       ...parsed,
       adsterra_direct_link: parsed.adsterra_direct_link || defaultDirectLink,
       vite_adsterra_direct_link: parsed.vite_adsterra_direct_link || defaultDirectLink,
+      adsterra_banner_script: parsed.adsterra_banner_script !== undefined ? parsed.adsterra_banner_script : '',
+      adsterra_popunder_script: parsed.adsterra_popunder_script !== undefined ? parsed.adsterra_popunder_script : '',
+      adsterra_social_bar_script: parsed.adsterra_social_bar_script !== undefined ? parsed.adsterra_social_bar_script : '',
       slots: {
         ...DEFAULT_AD_SETTINGS.slots,
         ...(parsed.slots || {}),

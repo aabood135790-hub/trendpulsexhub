@@ -4,7 +4,7 @@ import {
   FileText, Tags, Newspaper, Download, Edit, Trash2, Plus, ExternalLink, 
   Bot, RefreshCw, CheckCircle2, Clock, Zap, Database, Megaphone, Flame, 
   Code, Image as ImageIcon, Check, Sliders, AlertCircle, Play, Cpu, Key, 
-  Mail, MessageSquare, User, Globe, Link2, Copy, Sparkles, ShieldCheck
+  Mail, MessageSquare, User, Globe, Link2, Copy, Sparkles, ShieldCheck, BarChart3
 } from 'lucide-react';
 import { Post } from '../../types';
 import { getPosts, clearLocalStorageAndReseed } from '../../lib/mock-data';
@@ -14,11 +14,14 @@ import { useAds } from '../../context/AdContext';
 import { AdSlotId, AdSlotConfig } from '../../lib/adConfig';
 import { AISettingsPanel } from '../../components/admin/AISettingsPanel';
 import { SEOMetaTagsPanel } from '../../components/admin/SEOMetaTagsPanel';
+import { AvatarManagerPanel } from '../../components/admin/AvatarManagerPanel';
+import { AdminSecurityPanel } from '../../components/admin/AdminSecurityPanel';
+import { AdminAnalyticsPanel } from '../../components/admin/AdminAnalyticsPanel';
 
-type AdminTab = 'posts' | 'ads' | 'seo' | 'viral-trends' | 'ai-settings' | 'inquiries';
+type AdminTab = 'analytics' | 'posts' | 'ads' | 'seo' | 'viral-trends' | 'avatar' | 'security' | 'ai-settings' | 'inquiries';
 
 export function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('posts');
+  const [activeTab, setActiveTab] = useState<AdminTab>('analytics');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState<any>(null);
@@ -43,14 +46,26 @@ export function AdminDashboard() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [slotFilter, setSlotFilter] = useState<'all' | 'article' | 'sidebar' | 'directory'>('all');
 
-  // Local form inputs for direct links to provide instant typing reactivity
+  // Local form inputs for all 4 Adsterra formats to provide instant typing reactivity
   const [adsterraDirectLink, setAdsterraDirectLink] = useState(adSettings.adsterra_direct_link || '');
   const [viteAdsterraDirectLink, setViteAdsterraDirectLink] = useState(adSettings.vite_adsterra_direct_link || '');
+  const [adsterraBannerScript, setAdsterraBannerScript] = useState(adSettings.adsterra_banner_script || '');
+  const [adsterraPopunderScript, setAdsterraPopunderScript] = useState(adSettings.adsterra_popunder_script || '');
+  const [adsterraSocialBarScript, setAdsterraSocialBarScript] = useState(adSettings.adsterra_social_bar_script || '');
 
   useEffect(() => {
     setAdsterraDirectLink(adSettings.adsterra_direct_link || '');
     setViteAdsterraDirectLink(adSettings.vite_adsterra_direct_link || '');
-  }, [adSettings.adsterra_direct_link, adSettings.vite_adsterra_direct_link]);
+    setAdsterraBannerScript(adSettings.adsterra_banner_script || '');
+    setAdsterraPopunderScript(adSettings.adsterra_popunder_script || '');
+    setAdsterraSocialBarScript(adSettings.adsterra_social_bar_script || '');
+  }, [
+    adSettings.adsterra_direct_link, 
+    adSettings.vite_adsterra_direct_link,
+    adSettings.adsterra_banner_script,
+    adSettings.adsterra_popunder_script,
+    adSettings.adsterra_social_bar_script
+  ]);
 
   const loadDashboard = async () => {
     const data = await getPosts();
@@ -143,14 +158,19 @@ export function AdminDashboard() {
     setTimeout(() => setSyncMessage(null), 4000);
   };
 
-  const handleSaveDirectLinks = () => {
+  const handleSaveAdsterraConfig = () => {
     updateGlobalSettings({
       adsterra_direct_link: adsterraDirectLink.trim(),
       vite_adsterra_direct_link: viteAdsterraDirectLink.trim(),
+      adsterra_banner_script: adsterraBannerScript.trim(),
+      adsterra_popunder_script: adsterraPopunderScript.trim(),
+      adsterra_social_bar_script: adsterraSocialBarScript.trim(),
     });
-    setAdSuccessMsg('✓ Adsterra Direct Links saved and dynamically activated across all buttons & claim CTAs!');
+    setAdSuccessMsg('✓ All 4 Adsterra ad formats updated and activated across all live routes!');
     setTimeout(() => setAdSuccessMsg(null), 4500);
   };
+
+  const handleSaveDirectLinks = handleSaveAdsterraConfig;
 
   const handleCopyDirectLink = () => {
     if (activeDirectLink) {
@@ -230,6 +250,17 @@ export function AdminDashboard() {
       {/* Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-indigo-950/10 pb-3 overflow-x-auto scrollbar-none">
         <button
+          onClick={() => setActiveTab('analytics')}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'analytics'
+              ? 'bg-gradient-to-r from-sapphire-600 via-sky-600 to-indigo-700 text-white shadow-md shadow-sapphire-600/25 ring-2 ring-sky-400/40'
+              : 'bg-white hover:bg-azure-50 text-indigo-900/70 border border-indigo-950/10'
+          }`}
+        >
+          <BarChart3 size={15} className="text-sky-300" /> Site Analytics & Traffic
+        </button>
+
+        <button
           onClick={() => setActiveTab('posts')}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'posts'
@@ -271,6 +302,28 @@ export function AdminDashboard() {
           }`}
         >
           <Flame size={15} className="text-rose-400" /> Viral Trends Engine
+        </button>
+
+        <button
+          onClick={() => setActiveTab('avatar')}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'avatar'
+              ? 'bg-gradient-to-r from-sky-600 to-indigo-700 text-white shadow-md shadow-sky-600/25 ring-2 ring-sky-400/40'
+              : 'bg-white hover:bg-azure-50 text-indigo-900/70 border border-indigo-950/10'
+          }`}
+        >
+          <User size={15} className="text-sky-300" /> Default Avatar Manager
+        </button>
+
+        <button
+          onClick={() => setActiveTab('security')}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'security'
+              ? 'bg-gradient-to-r from-emerald-600 to-indigo-900 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-400/40'
+              : 'bg-white hover:bg-azure-50 text-indigo-900/70 border border-indigo-950/10'
+          }`}
+        >
+          <ShieldCheck size={15} className="text-emerald-300" /> Admin Security & Password
         </button>
 
         <button
@@ -354,6 +407,11 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* TAB 0: SITE ANALYTICS & VISITOR COUNTERS */}
+      {activeTab === 'analytics' && (
+        <AdminAnalyticsPanel />
+      )}
 
       {/* TAB 1: ALL POSTS */}
       {activeTab === 'posts' && (
@@ -513,20 +571,20 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* 1. DEDICATED ADSTERRA DIRECT LINK CONTROL SUITE */}
+          {/* 1. DEDICATED AD INTEGRATION CONFIG (OFFICIAL ADSTERRA NETWORK SUITE) */}
           <div className="bg-gradient-to-br from-indigo-950 via-sapphire-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-sapphire-400/25 relative overflow-hidden space-y-6">
             <div className="absolute top-0 right-0 -mr-16 -mt-16 h-48 w-48 rounded-full bg-sky-400/15 blur-3xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
               <div>
                 <div className="flex items-center gap-2 text-sky-400 text-xs font-black uppercase tracking-wider">
-                  <Link2 size={16} /> High-CPM Direct Link Engine
+                  <Megaphone size={16} /> Official Adsterra Integration Suite
                 </div>
-                <h3 className="text-lg md:text-xl font-black text-white mt-1">
-                  Dynamic Adsterra Direct Link URLs
+                <h3 className="text-lg md:text-2xl font-black text-white mt-1">
+                  Ad Integration Config (4 Live Formats)
                 </h3>
-                <p className="text-xs text-azure-100/70 font-medium mt-0.5">
-                  These URLs power every single "Copy Code", "Claim Bonus Box", and "Get Rewards" trigger site-wide.
+                <p className="text-xs text-azure-100/70 font-medium mt-0.5 max-w-2xl">
+                  Configure all 4 official Adsterra ad formats directly below. Enter your live Adsterra script tags and Smartlink URL to deploy real-time monetization across the entire site.
                 </p>
               </div>
 
@@ -537,75 +595,161 @@ export function AdminDashboard() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3.5 py-2 rounded-xl text-xs font-bold transition-all"
                 >
-                  <ExternalLink size={13} /> Test Direct Link
+                  <ExternalLink size={13} /> Test Smartlink
                 </a>
                 <button
                   onClick={handleCopyDirectLink}
                   className="inline-flex items-center gap-1.5 bg-sky-400 hover:bg-sky-300 text-indigo-950 px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer"
                 >
                   {copiedLink ? <Check size={13} /> : <Copy size={13} />}
-                  <span>{copiedLink ? 'Copied!' : 'Copy URL'}</span>
+                  <span>{copiedLink ? 'Copied!' : 'Copy Smartlink'}</span>
                 </button>
               </div>
             </div>
 
-            {/* Inputs for ADSTERRA_DIRECT_LINK and VITE_ADSTERRA_DIRECT_LINK */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center justify-between">
-                  <span>Primary Direct Link (ADSTERRA_DIRECT_LINK)</span>
-                  <span className="text-[10px] font-mono text-emerald-400 font-bold">Highest Priority</span>
-                </label>
-                <input
-                  type="text"
-                  value={adsterraDirectLink}
-                  onChange={(e) => setAdsterraDirectLink(e.target.value)}
-                  placeholder="https://www.profitablecpmrate.com/d0b9y9a3e?key=..."
-                  className="w-full bg-slate-900/90 border border-sky-400/30 rounded-2xl px-4 py-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner"
-                />
-                <p className="text-[11px] text-azure-100/60 font-medium">
-                  Primary Adsterra smartlink for background tab redirects upon gamer code copies.
-                </p>
+            {/* THE 4 OFFICIAL ADSTERRA FORMAT FIELDS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* FORMAT 1: Direct Link / Smartlink */}
+              <div className="bg-slate-900/60 border border-sky-400/25 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <Link2 size={14} className="text-sky-400" />
+                      1. Direct Link / Smartlink Field
+                    </label>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Active on Action Buttons
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={adsterraDirectLink}
+                    onChange={(e) => setAdsterraDirectLink(e.target.value)}
+                    placeholder="https://www.profitablecpmrate.com/d0b9y9a3e?key=..."
+                    className="w-full bg-slate-950 border border-sky-400/30 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner"
+                  />
+                  <p className="text-[11px] text-azure-100/70 font-medium leading-relaxed">
+                    🔗 <strong>Behavior:</strong> Bound to all primary action buttons (<strong>"Download"</strong>, <strong>"Get Code"</strong>, <strong>"Copy"</strong>, <strong>"Claim Bonus"</strong>) so clicking them opens the Adsterra Direct Link in a new tab while executing the primary action.
+                  </p>
+                </div>
+                <div className="text-[10px] font-mono text-azure-200/50 truncate">
+                  Target: {adsterraDirectLink || 'Using default smartlink'}
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-wider text-azure-200 flex items-center justify-between">
-                  <span>Client Fallback Link (VITE_ADSTERRA_DIRECT_LINK)</span>
-                  <span className="text-[10px] font-mono text-sky-300 font-bold">Client Fallback</span>
-                </label>
-                <input
-                  type="text"
-                  value={viteAdsterraDirectLink}
-                  onChange={(e) => setViteAdsterraDirectLink(e.target.value)}
-                  placeholder="https://www.profitablecpmrate.com/..."
-                  className="w-full bg-slate-900/90 border border-white/20 rounded-2xl px-4 py-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner"
-                />
-                <p className="text-[11px] text-azure-100/60 font-medium">
-                  Secondary fallback URL if no primary link is returned by backend config.
-                </p>
+              {/* FORMAT 2: Banner Ads */}
+              <div className="bg-slate-900/60 border border-sky-400/25 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <ImageIcon size={14} className="text-sky-400" />
+                      2. Banner Ads Field
+                    </label>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                      adsterraBannerScript ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600'
+                    }`}>
+                      {adsterraBannerScript ? 'Script Loaded' : 'Empty'}
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={adsterraBannerScript}
+                    onChange={(e) => setAdsterraBannerScript(e.target.value)}
+                    placeholder="<script type='text/javascript' src='//www.profitablecpmrate.com/banner-id/invoke.js'></script>"
+                    className="w-full bg-slate-950 border border-sky-400/30 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner resize-y"
+                  />
+                  <p className="text-[11px] text-azure-100/70 font-medium leading-relaxed">
+                    🖼️ <strong>Behavior:</strong> Renders this ad script inside the <strong>header/top area of article pages (PostView)</strong> and within the <strong>Promo Codes Directory (CodesList)</strong>.
+                  </p>
+                </div>
+                <div className="text-[10px] text-azure-200/50">
+                  Accepts raw &lt;script&gt; tags, iframe embed code, or script src URLs.
+                </div>
               </div>
+
+              {/* FORMAT 3: Popunder Script */}
+              <div className="bg-slate-900/60 border border-sky-400/25 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <Globe size={14} className="text-sky-400" />
+                      3. Popunder Script Field
+                    </label>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                      adsterraPopunderScript ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600'
+                    }`}>
+                      {adsterraPopunderScript ? 'Global Head Active' : 'Empty'}
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={adsterraPopunderScript}
+                    onChange={(e) => setAdsterraPopunderScript(e.target.value)}
+                    placeholder="<script type='text/javascript' src='//pl12345678.profitablecpmrate.com/ab/cd/ef/abcdef123456.js'></script>"
+                    className="w-full bg-slate-950 border border-sky-400/30 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner resize-y"
+                  />
+                  <p className="text-[11px] text-azure-100/70 font-medium leading-relaxed">
+                    ⚡ <strong>Behavior:</strong> Embedded globally in the root layout / HTML <strong>&lt;head&gt;</strong> to trigger high-CPM popunders across all routes upon user interaction.
+                  </p>
+                </div>
+                <div className="text-[10px] text-azure-200/50">
+                  Automatically injected into document &lt;head&gt; across all application routes.
+                </div>
+              </div>
+
+              {/* FORMAT 4: Social Bar Script */}
+              <div className="bg-slate-900/60 border border-sky-400/25 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <Sparkles size={14} className="text-sky-400" />
+                      4. Social Bar Script Field
+                    </label>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                      adsterraSocialBarScript ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600'
+                    }`}>
+                      {adsterraSocialBarScript ? 'AppLayout Floating Active' : 'Empty'}
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={adsterraSocialBarScript}
+                    onChange={(e) => setAdsterraSocialBarScript(e.target.value)}
+                    placeholder="<script type='text/javascript' src='//pl87654321.profitablecpmrate.com/98/76/54/9876543210ab.js'></script>"
+                    className="w-full bg-slate-950 border border-sky-400/30 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 shadow-inner resize-y"
+                  />
+                  <p className="text-[11px] text-azure-100/70 font-medium leading-relaxed">
+                    🔔 <strong>Behavior:</strong> Embedded into the <strong>AppLayout container</strong> to display floating / interactive notification &amp; widget ads site-wide.
+                  </p>
+                </div>
+                <div className="text-[10px] text-azure-200/50">
+                  Automatically injected into AppLayout body container across all views.
+                </div>
+              </div>
+
             </div>
 
             {/* Currently Active Live URL Indicator & Save Action */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 bg-black/20 p-4 rounded-2xl border border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 bg-black/30 p-4 rounded-2xl border border-white/10">
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span className="text-xs font-bold text-azure-200 shrink-0">Live Active Link:</span>
+                <span className="text-xs font-bold text-azure-200 shrink-0">Direct Smartlink Active:</span>
                 <span className="text-xs font-mono text-emerald-300 truncate font-semibold">
                   {activeDirectLink}
                 </span>
               </div>
 
               <button
-                onClick={handleSaveDirectLinks}
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 to-azure-300 hover:from-sky-300 hover:to-azure-200 text-indigo-950 px-6 py-2.5 rounded-xl font-black text-xs shadow-lg shadow-sky-400/25 transition-all active:scale-95 cursor-pointer shrink-0"
+                onClick={handleSaveAdsterraConfig}
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 via-azure-300 to-sky-400 hover:from-sky-300 hover:to-azure-200 text-indigo-950 px-6 py-3 rounded-xl font-black text-xs shadow-lg shadow-sky-400/25 transition-all active:scale-95 cursor-pointer shrink-0"
               >
-                <Check size={15} strokeWidth={3} />
-                <span>Save & Activate Direct Links</span>
+                <Check size={16} strokeWidth={3} />
+                <span>Save &amp; Activate All 4 Adsterra Formats</span>
               </button>
             </div>
 
-            {/* Monetization Preset Quick Buttons */}
+            {/* Monetization Presets & Utilities */}
             <div className="pt-2 flex items-center gap-3 flex-wrap">
               <span className="text-xs font-bold text-azure-200/80">Monetization Presets:</span>
               <button
@@ -906,12 +1050,22 @@ export function AdminDashboard() {
         />
       )}
 
-      {/* TAB 5: AI SERVICE & API KEYS MANAGEMENT */}
+      {/* TAB 5: DEFAULT AVATAR MANAGER */}
+      {activeTab === 'avatar' && (
+        <AvatarManagerPanel />
+      )}
+
+      {/* TAB 6: ADMIN SECURITY & PASSWORD MANAGEMENT */}
+      {activeTab === 'security' && (
+        <AdminSecurityPanel />
+      )}
+
+      {/* TAB 7: AI SERVICE & API KEYS MANAGEMENT */}
       {activeTab === 'ai-settings' && (
         <AISettingsPanel />
       )}
 
-      {/* TAB 6: CONTACT INQUIRIES */}
+      {/* TAB 8: CONTACT INQUIRIES */}
       {activeTab === 'inquiries' && (
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-3xl border border-indigo-950/10 shadow-sm flex items-center justify-between">

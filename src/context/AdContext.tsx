@@ -31,14 +31,19 @@ export function AdProvider({ children }: { children: ReactNode }) {
         const res = await fetch('/api/admin/ad-config');
         if (res.ok) {
           const data = await res.json();
-          if (data && data.slots) {
+          if (data) {
             setAdSettings((prev) => {
               const merged: AdSettingsState = {
                 ...prev,
                 ...data,
+                adsterra_direct_link: data.adsterra_direct_link !== undefined ? data.adsterra_direct_link : prev.adsterra_direct_link,
+                vite_adsterra_direct_link: data.vite_adsterra_direct_link !== undefined ? data.vite_adsterra_direct_link : prev.vite_adsterra_direct_link,
+                adsterra_banner_script: data.adsterra_banner_script !== undefined ? data.adsterra_banner_script : prev.adsterra_banner_script,
+                adsterra_popunder_script: data.adsterra_popunder_script !== undefined ? data.adsterra_popunder_script : prev.adsterra_popunder_script,
+                adsterra_social_bar_script: data.adsterra_social_bar_script !== undefined ? data.adsterra_social_bar_script : prev.adsterra_social_bar_script,
                 slots: {
                   ...prev.slots,
-                  ...data.slots,
+                  ...(data.slots || {}),
                 },
               };
               saveLocalAdSettings(merged);

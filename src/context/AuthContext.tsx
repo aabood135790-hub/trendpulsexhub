@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserProfile } from '../types';
 import { supabase, isSupabaseConfigured, uploadSupabasePhoto } from '../lib/supabase';
+import { getActiveDefaultAvatar, fetchServerDefaultAvatar } from '../lib/avatarConfig';
 
 export const PROMO_CODES_REGISTRY: Record<string, { credits: number; title: string; description: string }> = {
   'SPECIAL10K': {
@@ -54,11 +55,11 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const DEFAULT_PROFILE: UserProfile = {
+const getDefaultProfile = (): UserProfile => ({
   id: 'usr_gamer_trendpulse_default',
   username: 'ApexRaider_X',
   display_name: 'Apex Raider',
-  avatar_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=300',
+  avatar_url: getActiveDefaultAvatar(),
   bio: 'Hunting the rarest codes, awakenings & speedruns across Roblox & Genshin 🎮',
   favorite_game: 'Roblox Blox Fruits',
   role: 'admin',
@@ -67,7 +68,9 @@ const DEFAULT_PROFILE: UserProfile = {
   redeemed_codes: [],
   last_daily_claim_at: null,
   created_at: new Date().toISOString(),
-};
+});
+
+const DEFAULT_PROFILE: UserProfile = getDefaultProfile();
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -223,6 +226,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       setIsLoading(false);
     }
+
+    // 3. Fetch server default avatar & register change listener
+    fetchServerDefaultAvatar();
+
+    const handleAvatarChange = (e: any) => {
+      const newAvatar = e.detail?.avatarUrl;
+      if (newAvatar) {
+        setProfile(prev => {
+          if (!prev) return prev;
+          // If user was using the default fallback avatar, update to new default avatar
+          if (!prev.avatar_url || prev.avatar_url.includes('unsplash.com/photo-1566492031773-4f4e44671857')) {
+            const updated = { ...prev, avatar_url: newAvatar };
+            localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
+            return updated;
+          }
+          return prev;
+        });
+      }
+    };
+
+    window.addEventListener('trendpulse_default_avatar_changed', handleAvatarChange);
+    return () => {
+      window.removeEventListener('trendpulse_default_avatar_changed', handleAvatarChange);
+    };
   }, []);
 
   const openEditProfile = () => setIsEditProfileOpen(true);

@@ -32,9 +32,16 @@ export function UniversalAdSlot({
     ? slot.target_url 
     : activeDirectLink;
 
+  // Derive effective Adsterra banner script (from slot specific or global 4-format Adsterra banner field)
+  const effectiveScript = (slot.html_script && slot.html_script.trim() !== '') 
+    ? slot.html_script 
+    : (adSettings.adsterra_banner_script && adSettings.adsterra_banner_script.trim() !== '') 
+      ? adSettings.adsterra_banner_script 
+      : '';
+
   // Handle dynamic Adsterra / custom HTML/JS scripts execution
   useEffect(() => {
-    if (!slot.html_script || slot.html_script.trim() === '' || !scriptContainerRef.current) return;
+    if (!effectiveScript || effectiveScript.trim() === '' || !scriptContainerRef.current) return;
 
     const container = scriptContainerRef.current;
     container.innerHTML = '';
@@ -71,7 +78,7 @@ export function UniversalAdSlot({
               </style>
             </head>
             <body>
-              ${slot.html_script}
+              ${effectiveScript}
             </body>
           </html>
         `);
@@ -94,7 +101,7 @@ export function UniversalAdSlot({
     return () => {
       if (container) container.innerHTML = '';
     };
-  }, [slot.html_script, slot.size_label]);
+  }, [effectiveScript, slot.size_label]);
 
   const handleBannerClick = (e: React.MouseEvent) => {
     if (destinationUrl && destinationUrl !== '#') {
@@ -107,8 +114,8 @@ export function UniversalAdSlot({
     }
   };
 
-  // Case 1: Custom HTML / JS Script Ad (Adsterra Code Tag)
-  if (slot.html_script && slot.html_script.trim().length > 0) {
+  // Case 1: Custom HTML / JS Script Ad (Adsterra Banner Code Tag)
+  if (effectiveScript && effectiveScript.trim().length > 0) {
     return (
       <div 
         id={`ad-slot-${slotId}`}
@@ -117,7 +124,7 @@ export function UniversalAdSlot({
         <div className="flex items-center justify-between w-full px-2 mb-1.5 text-[10px] font-black uppercase tracking-wider text-indigo-950/40">
           <span className="flex items-center gap-1">
             <Megaphone size={10} className="text-sapphire-600" />
-            <span>Advertisement</span>
+            <span>Adsterra Banner Placement</span>
           </span>
           <span className="font-mono text-[9px] bg-slate-100 px-1.5 py-0.5 rounded">{slot.size_label}</span>
         </div>

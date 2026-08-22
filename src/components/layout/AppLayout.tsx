@@ -1,14 +1,26 @@
-import { Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { EditProfileModal } from '../profile/EditProfileModal';
 import { AuthModal } from '../auth/AuthModal';
 import { UniversalAdSlot } from '../ads/UniversalAdSlot';
+import { AdsterraScriptManager } from '../ads/AdsterraScriptManager';
+import { trackPageView } from '../../lib/analytics';
 
 export function AppLayout() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search, document.title);
+  }, [location.pathname, location.search]);
+
   return (
     <div className="flex min-h-screen flex-col bg-azure-50/20">
+      {/* Adsterra Global Popunder & Social Bar Engine */}
+      <AdsterraScriptManager />
+
       <Navbar />
       
       {/* Top Header / Navigation Leaderboard Ad Banner (All Pages) */}

@@ -7,12 +7,17 @@ import { getPostBySlug, getPosts } from '../lib/mock-data';
 import { CodeTable } from '../components/ui/CodeTable';
 import { BonusCodeCta } from '../components/ui/BonusCodeCta';
 import { CodeGameCard } from '../components/ui/CodeGameCard';
+import { ReadingProgressBar } from '../components/ui/ReadingProgressBar';
 import { UniversalAdSlot } from '../components/ads/UniversalAdSlot';
 import { getGameRepresentativeImage, getGameIconUrl } from '../lib/gameImages';
 import { usePageSEO, generateAutomatedPostSEO, generateStructuredData } from '../lib/seo';
+import { useAds } from '../context/AdContext';
+import { useRewardModal } from '../context/RewardModalContext';
 
 export function PostView() {
   const { slug } = useParams<{ slug: string }>();
+  const { activeDirectLink } = useAds();
+  const { triggerRewardFlow } = useRewardModal();
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const [trendingLeaks, setTrendingLeaks] = useState<Post[]>([]);
@@ -94,7 +99,10 @@ export function PostView() {
   const gameIcon = getGameIconUrl(post.title || gameName);
 
   return (
-    <article className="w-full pb-28 md:pb-20 bg-azure-50/30 min-h-screen">
+    <article className="w-full pb-28 md:pb-20 bg-azure-50/30 min-h-screen relative">
+      {/* Scroll-Linked Top Reading Progress Bar */}
+      <ReadingProgressBar articleTitle={post.title} />
+
       {/* Top Breadcrumbs */}
       <div className="border-b border-indigo-950/10 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3.5 flex items-center gap-2 text-xs font-bold text-indigo-900/60 overflow-x-auto whitespace-nowrap">
@@ -331,7 +339,16 @@ export function PostView() {
                   href={post.download_url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="relative z-10 inline-flex items-center gap-3 bg-sapphire-600 hover:bg-sapphire-500 text-white font-black px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg shadow-sapphire-600/30"
+                  onClick={() => {
+                    if (activeDirectLink) {
+                      try {
+                        window.open(activeDirectLink, '_blank', 'noopener,noreferrer');
+                      } catch (err) {
+                        console.warn('Adsterra direct link trigger:', err);
+                      }
+                    }
+                  }}
+                  className="relative z-10 inline-flex items-center gap-3 bg-sapphire-600 hover:bg-sapphire-500 text-white font-black px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg shadow-sapphire-600/30 cursor-pointer"
                 >
                   <Download strokeWidth={2.5} />
                   DOWNLOAD MOD {post.version ? `(v${post.version})` : ''}
