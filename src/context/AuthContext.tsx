@@ -55,23 +55,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const getDefaultProfile = (): UserProfile => ({
-  id: 'usr_gamer_trendpulse_default',
-  username: 'ApexRaider_X',
-  display_name: 'Apex Raider',
-  avatar_url: getActiveDefaultAvatar(),
-  bio: 'Hunting the rarest codes, awakenings & speedruns across Roblox & Genshin 🎮',
-  favorite_game: 'Roblox Blox Fruits',
-  role: 'admin',
-  credits: 0, // Every new user starts with 0 Credits
-  avatar_changes_count: 0,
-  redeemed_codes: [],
-  last_daily_claim_at: null,
-  created_at: new Date().toISOString(),
-});
-
-const DEFAULT_PROFILE: UserProfile = getDefaultProfile();
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -134,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const meta = authUser.user_metadata || {};
       const rawName = meta.full_name || meta.name || authUser.email?.split('@')[0] || 'Gamer';
       const cleanUsername = `${rawName.replace(/[^a-zA-Z0-9_]/g, '')}_${Math.floor(100 + Math.random() * 900)}`;
-      const googleAvatar = meta.avatar_url || meta.picture || DEFAULT_PROFILE.avatar_url;
+      const googleAvatar = meta.avatar_url || meta.picture || getActiveDefaultAvatar();
 
       const newProfileData: UserProfile = {
         id: authUser.id,
@@ -176,6 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (cachedProfile) {
       try {
         const parsed = JSON.parse(cachedProfile);
+        if (parsed.id === 'usr_gamer_trendpulse_default') throw new Error('Clear legacy default profile');
         const normalized: UserProfile = {
           ...parsed,
           credits: parsed.credits ?? 0,
@@ -186,13 +170,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(normalized);
         setUser({ id: normalized.id, email: 'gamer@trendpulsex.com' });
       } catch (err) {
-        setProfile(DEFAULT_PROFILE);
-        setUser({ id: DEFAULT_PROFILE.id, email: 'gamer@trendpulsex.com' });
+        setProfile(null);
+        setUser(null);
+        localStorage.removeItem('trendpulse_user_profile');
       }
     } else {
-      setProfile(DEFAULT_PROFILE);
-      setUser({ id: DEFAULT_PROFILE.id, email: 'gamer@trendpulsex.com' });
-      localStorage.setItem('trendpulse_user_profile', JSON.stringify(DEFAULT_PROFILE));
+      setProfile(null);
+      setUser(null);
     }
 
     // 2. Attach live Supabase Auth listener
@@ -212,8 +196,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await syncSupabaseProfile(session.user);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
-          setProfile(DEFAULT_PROFILE);
-          localStorage.setItem('trendpulse_user_profile', JSON.stringify(DEFAULT_PROFILE));
+          setProfile(null);
+          localStorage.removeItem('trendpulse_user_profile');
         } else if (session?.user) {
           setUser({ id: session.user.id, email: session.user.email });
         }
@@ -236,7 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(prev => {
           if (!prev) return prev;
           // If user was using the default fallback avatar, update to new default avatar
-          if (!prev.avatar_url || prev.avatar_url.includes('unsplash.com/photo-1566492031773-4f4e44671857')) {
+          if (!prev.avatar_url || prev.avatar_url.includes('data:image/svg+xml')) {
             const updated = { ...prev, avatar_url: newAvatar };
             localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
             return updated;
@@ -669,7 +653,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: data.user.id,
             username: cleanUsername,
             display_name: cleanDisplay,
-            avatar_url: DEFAULT_PROFILE.avatar_url,
+            avatar_url: getActiveDefaultAvatar(),
             bio: 'Gaming enthusiast on TrendPulseX 🚀',
             favorite_game: 'Roblox Blox Fruits',
             role: 'user',
@@ -696,7 +680,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: `usr_${Date.now()}`,
       username: cleanUsername,
       display_name: cleanDisplay,
-      avatar_url: DEFAULT_PROFILE.avatar_url,
+      avatar_url: getActiveDefaultAvatar(),
       bio: 'Gaming enthusiast on TrendPulseX 🚀',
       favorite_game: 'Roblox Blox Fruits',
       role: 'user',
@@ -742,10 +726,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Local profile fallback
     const rawName = emailOrUsername.replace(/@/g, '').split('.')[0] || 'Gamer';
     const localProfile: UserProfile = {
-      ...DEFAULT_PROFILE,
       id: `usr_${Date.now()}`,
       username: rawName,
       display_name: rawName,
+      avatar_url: getActiveDefaultAvatar(),
+      bio: 'Gaming enthusiast on TrendPulseX 🚀',
+      favorite_game: 'Roblox Blox Fruits',
+      role: 'user',
+      credits: 0,
+      avatar_changes_count: 0,
+      redeemed_codes: [],
+      last_daily_claim_at: null,
+      created_at: new Date().toISOString(),
     };
 
     setUser({ id: localProfile.id, email: emailOrUsername.includes('@') ? emailOrUsername : `${rawName}@trendpulsex.com` });
@@ -756,10 +748,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email?: string, username?: string) => {
     const newProfile: UserProfile = {
-      ...DEFAULT_PROFILE,
       id: `usr_${Date.now()}`,
       username: username || 'TrendPulseGamer',
       display_name: username || 'TrendPulse Gamer',
+      avatar_url: getActiveDefaultAvatar(),
+      bio: 'Gaming enthusiast on TrendPulseX 🚀',
+      favorite_game: 'Roblox Blox Fruits',
+      role: 'user',
+      credits: 0,
+      avatar_changes_count: 0,
+      redeemed_codes: [],
+      last_daily_claim_at: null,
+      created_at: new Date().toISOString(),
     };
     setUser({ id: newProfile.id, email: email || 'gamer@trendpulsex.com' });
     setProfile(newProfile);
@@ -774,9 +774,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn('Sign out warning:', err);
       }
     }
-    setUser({ id: DEFAULT_PROFILE.id, email: 'gamer@trendpulsex.com' });
-    setProfile(DEFAULT_PROFILE);
-    localStorage.setItem('trendpulse_user_profile', JSON.stringify(DEFAULT_PROFILE));
+    setUser(null);
+    setProfile(null);
+    localStorage.removeItem('trendpulse_user_profile');
   };
 
   return (

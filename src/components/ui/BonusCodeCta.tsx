@@ -27,7 +27,7 @@ export function BonusCodeCta({
   subtitle = "Click to claim +100 Credits added directly to your wallet & access exclusive drops!" 
 }: BonusCodeCtaProps) {
   const { triggerRewardFlow } = useRewardModal();
-  const { isDailyGiftAvailable, remainingDailyClaimMs, openWalletModal } = useAuth();
+  const { isAuthenticated, isDailyGiftAvailable, remainingDailyClaimMs, openWalletModal, openAuthModal } = useAuth();
   const { activeDirectLink } = useAds();
 
   const targetLink = url || activeDirectLink;
@@ -35,7 +35,7 @@ export function BonusCodeCta({
   const handleClaim = (e: MouseEvent) => {
     e.preventDefault();
     if (!isDailyGiftAvailable) {
-      openWalletModal();
+      isAuthenticated ? openWalletModal() : openAuthModal("signin");
       return;
     }
     triggerRewardFlow({ adUrl: targetLink, rewardTitle: title, creditBonus: 100 });

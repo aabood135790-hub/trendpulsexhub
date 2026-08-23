@@ -395,7 +395,7 @@ export function EditProfileModal() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.replace(/\s+/g, '_'))}
-                    placeholder="e.g. ApexRaider_X"
+                    placeholder=""
                     maxLength={20}
                     className="w-full pl-7 pr-3 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white focus:ring-2 focus:ring-sapphire-600/20"
                     required
@@ -412,7 +412,7 @@ export function EditProfileModal() {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="e.g. Apex Raider"
+                  placeholder=""
                   maxLength={30}
                   className="w-full px-3.5 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white focus:ring-2 focus:ring-sapphire-600/20"
                 />

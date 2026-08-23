@@ -23,7 +23,7 @@ const GAME_FILTERS = [
 ];
 
 export function Community() {
-  const { profile, user, openEditProfile } = useAuth();
+  const { profile, user, isAuthenticated, openEditProfile, openAuthModal } = useAuth();
 
   const [posts, setPosts] = useState<CommunityPost[]>(mockCommunityPosts);
   const [isLoading, setIsLoading] = useState(true);
@@ -169,7 +169,7 @@ export function Community() {
               <Plus size={18} strokeWidth={3} /> Create Post
             </button>
             <button
-              onClick={openEditProfile}
+              onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-2xl font-bold transition-all text-sm cursor-pointer"
             >
               <ShieldCheck size={16} className="text-sky-300" /> Edit Profile
@@ -185,7 +185,7 @@ export function Community() {
           {/* Quick Create Post Box */}
           <div className="bg-white p-4 sm:p-5 rounded-3xl border border-indigo-950/10 shadow-sm flex items-center gap-3 sm:gap-4">
             <div 
-              onClick={openEditProfile}
+              onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
               className="h-11 w-11 rounded-full overflow-hidden border-2 border-azure-200 bg-sapphire-50 shrink-0 cursor-pointer hover:border-sapphire-600 transition-colors"
               title="Click to edit profile"
             >
@@ -347,7 +347,7 @@ export function Community() {
             )}
 
             <button
-              onClick={openEditProfile}
+              onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
               className="w-full py-2.5 rounded-xl bg-azure-50 hover:bg-azure-100 text-sapphire-700 font-bold text-xs border border-indigo-950/10 transition-colors"
             >
               Edit Gamer Profile
@@ -363,9 +363,9 @@ export function Community() {
 
             <div className="space-y-3">
               {[
-                { name: 'ApexRaider_X', drops: '48 verified codes', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=150' },
-                { name: 'Vortex_Gamer99', drops: '31 verified codes', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150' },
-                { name: 'GenshinMaster', drops: '24 verified codes', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150' },
+                { name: 'BloxMaster', drops: '48 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ec4899"><path d="M19.08 4.93l-1.41-1.42c-.39-.39-1.02-.39-1.41 0L4.93 14.85c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l11.33-11.33c.39-.39.39-1.03 0-1.41zM6.34 14.85l1.41-1.41 1.41 1.41-1.41 1.41-1.41-1.41z"/></svg>' },
+                { name: 'Vortex_Gamer99', drops: '31 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a855f7"><path d="M21.58 16.09l-1.09-7.66C20.18 6.27 18.4 5 16.32 5H7.68C5.6 5 3.82 6.27 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>' },
+                { name: 'GenshinMaster', drops: '24 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230ea5e9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z"/></svg>' },
               ].map((hunter, index) => (
                 <div key={hunter.name} className="flex items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-2.5">

@@ -52,13 +52,13 @@ export function AdminAnalyticsPanel() {
   };
 
   const metrics = stats?.metrics || {
-    totalPageViews: 14820,
-    todayViews: 412,
-    uniqueVisitors: 6050,
-    registeredUsersCount: 124,
-    newsletterSubscribersCount: 38,
-    activeSessionsEstimate: 18,
-    totalGamesMonitored: 8,
+    totalPageViews: 0,
+    todayViews: 0,
+    uniqueVisitors: 0,
+    registeredUsersCount: 0,
+    newsletterSubscribersCount: 0,
+    activeSessionsEstimate: 0,
+    totalGamesMonitored: 0,
     lastUpdated: new Date().toISOString(),
   };
 
@@ -214,14 +214,8 @@ export function AdminAnalyticsPanel() {
           </div>
 
           <div className="space-y-4">
-            {(stats?.topPages || [
-              { path: '/codes', views: 6340 },
-              { path: '/', views: 4120 },
-              { path: '/news', views: 2180 },
-              { path: '/community', views: 1420 },
-              { path: '/mods', views: 760 },
-            ]).map((item, idx) => {
-              const maxViews = stats?.topPages?.[0]?.views || 6340;
+            {(stats?.topPages || []).map((item, idx) => {
+              const maxViews = stats?.topPages?.[0]?.views || Math.max(1, item.views);
               const percentage = Math.round((item.views / maxViews) * 100);
 
               return (
@@ -233,12 +227,17 @@ export function AdminAnalyticsPanel() {
                   <div className="h-2.5 w-full bg-azure-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-sapphire-600 to-sky-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.max(percentage, 8)}%` }}
+                      style={{ width: `${Math.max(percentage, 2)}%` }}
                     />
                   </div>
                 </div>
               );
             })}
+            {(!stats?.topPages || stats.topPages.length === 0) && (
+              <div className="text-center py-6 text-sm text-indigo-900/40 font-medium">
+                No active traffic yet.
+              </div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-indigo-950/5 flex items-center justify-between text-xs text-indigo-900/60 font-medium">
@@ -260,12 +259,7 @@ export function AdminAnalyticsPanel() {
           </div>
 
           <div className="space-y-3 max-h-[340px] overflow-y-auto pr-1">
-            {(stats?.recentEvents && stats.recentEvents.length > 0 ? stats.recentEvents : [
-              { id: '1', type: 'pageview', path: '/codes', detail: 'Roblox Codes Directory', timestamp: new Date(Date.now() - 10000).toISOString() },
-              { id: '2', type: 'code_copy', path: '/codes', detail: 'Copied: SUB2GAMERROBOT_RESET1', timestamp: new Date(Date.now() - 45000).toISOString() },
-              { id: '3', type: 'newsletter_sub', path: '/codes', detail: 'New subscriber joined VIP list', timestamp: new Date(Date.now() - 120000).toISOString() },
-              { id: '4', type: 'signup', path: '/community', detail: 'New gamer registered account', timestamp: new Date(Date.now() - 300000).toISOString() },
-            ]).map((evt) => (
+            {(stats?.recentEvents || []).map((evt) => (
               <div 
                 key={evt.id} 
                 className="p-3 rounded-2xl bg-azure-50/50 border border-indigo-950/5 flex items-start gap-3 text-xs"
@@ -296,6 +290,11 @@ export function AdminAnalyticsPanel() {
                 </div>
               </div>
             ))}
+            {(!stats?.recentEvents || stats.recentEvents.length === 0) && (
+              <div className="text-center py-8 text-sm text-indigo-900/40 font-medium">
+                No recent activity events yet.
+              </div>
+            )}
           </div>
 
           <div className="pt-2 text-center">

@@ -16,7 +16,7 @@ const navItems = [
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { profile, user, credits, openEditProfile, openWalletModal, openAuthModal } = useAuth();
+  const { profile, isAuthenticated, credits, openEditProfile, openWalletModal, openAuthModal } = useAuth();
 
   return (
     <>
@@ -70,7 +70,7 @@ export function Navbar() {
 
             {/* User Wallet / Credits Button */}
             <button
-              onClick={openWalletModal}
+              onClick={() => isAuthenticated ? openWalletModal() : openAuthModal("signin")}
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-sapphire-900 to-indigo-950 text-white hover:from-sapphire-800 hover:to-indigo-900 shadow-sm border border-sapphire-400/30 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
               title="Open Credits Wallet & Daily Claim"
             >
@@ -88,9 +88,9 @@ export function Navbar() {
 
             {/* Profile Avatar Button */}
             <button
-              onClick={openEditProfile}
+              onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
               className="flex items-center gap-2 p-1 pl-1.5 sm:pr-3 rounded-full bg-white hover:bg-azure-100 border border-indigo-950/10 shadow-xs transition-all cursor-pointer group"
-              title="Edit Gamer Profile & Avatar"
+              title={isAuthenticated ? "Edit Gamer Profile & Avatar" : "Log In to Profile"}
             >
               <div className="h-7 w-7 rounded-full overflow-hidden border border-sapphire-600 bg-sapphire-50 shrink-0">
                 {profile?.avatar_url ? (
@@ -102,20 +102,22 @@ export function Navbar() {
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-sapphire-100 text-sapphire-700 font-black text-xs">
-                    {profile?.display_name?.charAt(0) || 'U'}
+                    {isAuthenticated ? (profile?.display_name?.charAt(0) || 'U') : '?'}
                   </div>
                 )}
               </div>
               <div className="hidden sm:flex flex-col items-start leading-tight text-left">
                 <span className="text-[11px] font-black text-indigo-950 max-w-[100px] truncate group-hover:text-sapphire-600 transition-colors">
-                  {profile?.username ? `@${profile.username}` : 'Profile'}
+                  {isAuthenticated ? (profile?.username ? `@${profile.username}` : 'Profile') : 'Guest'}
                 </span>
-                <span className="text-[9px] font-semibold text-sapphire-700">Edit Profile</span>
+                <span className="text-[9px] font-semibold text-sapphire-700">
+                  {isAuthenticated ? 'Edit Profile' : 'Log In'}
+                </span>
               </div>
             </button>
 
             {/* Quick Register / Sign Up Button */}
-            {(!user?.email || user.email === 'gamer@trendpulsex.com') && (
+            {(!isAuthenticated) && (
               <button
                 onClick={() => openAuthModal('signup')}
                 className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-black shadow-sm transition-all cursor-pointer hover:scale-105 active:scale-95"
@@ -148,7 +150,7 @@ export function Navbar() {
               <div
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  openWalletModal();
+                  isAuthenticated ? openWalletModal() : openAuthModal("signin");
                 }}
                 className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-sapphire-900 to-indigo-950 text-white shadow-md border border-sapphire-500/30 mb-2 cursor-pointer hover:opacity-95 transition-opacity"
               >
@@ -174,7 +176,7 @@ export function Navbar() {
               <div 
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  openEditProfile();
+                  isAuthenticated ? openEditProfile() : openAuthModal("signin");
                 }}
                 className="flex items-center justify-between p-3 rounded-2xl bg-azure-50 border border-indigo-950/10 mb-2 cursor-pointer"
               >
