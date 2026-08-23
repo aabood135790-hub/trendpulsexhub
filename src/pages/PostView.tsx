@@ -13,6 +13,7 @@ import { getGameRepresentativeImage, getGameIconUrl } from '../lib/gameImages';
 import { usePageSEO, generateAutomatedPostSEO, generateStructuredData } from '../lib/seo';
 import { useAds } from '../context/AdContext';
 import { useRewardModal } from '../context/RewardModalContext';
+import { NewsletterForm } from '../components/newsletter/NewsletterForm';
 
 export function PostView() {
   const { slug } = useParams<{ slug: string }>();
@@ -419,6 +420,11 @@ export function PostView() {
                   Visit Community Lounge →
                 </Link>
               </div>
+            </div>
+
+            {/* Sidebar Dedicated Newsletter Subscription Box */}
+            <div className="bg-slate-950 rounded-2xl p-5 text-white border border-white/10 shadow-md">
+              <NewsletterForm variant="card" />
             </div>
           </aside>
 

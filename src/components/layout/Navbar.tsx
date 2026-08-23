@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Search, Menu, X, Gamepad2, User, Users, Coins, Sparkles, Plus } from 'lucide-react';
+import { Search, Menu, X, Gamepad2, User, Users, Coins, Sparkles, Plus, Command } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
 import { WalletModal } from '../wallet/WalletModal';
+import { SearchModal } from '../search/SearchModal';
 
 const navItems = [
   { name: 'Home', path: '/' },
@@ -16,7 +17,20 @@ const navItems = [
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const { profile, isAuthenticated, credits, openEditProfile, openWalletModal, openAuthModal } = useAuth();
+
+  // Listen for Ctrl+K or Cmd+K or / to open search modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchModalOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <>
@@ -64,9 +78,18 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <Link to="/search" className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-xs border border-indigo-950/10 text-indigo-950 hover:bg-azure-100 transition-colors">
-              <Search size={18} />
-            </Link>
+            {/* Quick Search Autocomplete Trigger */}
+            <button 
+              onClick={() => setSearchModalOpen(true)} 
+              className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-white shadow-xs border border-indigo-950/10 text-indigo-950 hover:bg-azure-100 transition-colors cursor-pointer group"
+              title="Search Games, Codes & Guides (Ctrl+K)"
+            >
+              <Search size={16} className="text-sapphire-600 group-hover:scale-110 transition-transform" />
+              <span className="hidden xl:inline text-xs font-bold text-indigo-900/60">Search...</span>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-azure-100 text-[10px] font-mono text-indigo-900/60 font-bold border border-indigo-950/5">
+                ⌘K
+              </kbd>
+            </button>
 
             {/* User Wallet / Credits Button */}
             <button
@@ -227,14 +250,17 @@ export function Navbar() {
                   )}
                 </NavLink>
               ))}
-              <Link 
-                to="/search"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-4 py-3 rounded-xl font-bold text-indigo-900 hover:bg-azure-50 transition-all gap-3"
+              <button 
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setSearchModalOpen(true);
+                }}
+                className="w-full flex items-center px-4 py-3 rounded-xl font-bold text-indigo-900 hover:bg-azure-50 transition-all gap-3 text-left cursor-pointer"
               >
                 <Search size={20} className="text-sapphire-600" />
-                Search
-              </Link>
+                <span>Search Games & Codes...</span>
+              </button>
 
               <button
                 type="button"
@@ -250,6 +276,12 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Global Instant Search Autocomplete Modal */}
+      <SearchModal 
+        isOpen={searchModalOpen} 
+        onClose={() => setSearchModalOpen(false)} 
+      />
 
       {/* Global Wallet Modal */}
       <WalletModal />

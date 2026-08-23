@@ -10,6 +10,8 @@ import {
 import { usePageSEO } from '../lib/seo';
 import { UniversalAdSlot } from '../components/ads/UniversalAdSlot';
 import { BonusCodeCta } from '../components/ui/BonusCodeCta';
+import { SearchAutocomplete } from '../components/search/SearchAutocomplete';
+import { NewsletterForm } from '../components/newsletter/NewsletterForm';
 
 type CategoryFilter = 'All' | 'Popular' | 'Newest' | 'Verified';
 
@@ -145,15 +147,13 @@ export function CodesList() {
           Filter by popularity, latest drops, or verified working status. Copy any code with a single click to claim free boosts, spins, and stat resets instantly.
         </p>
 
-        {/* Search Bar */}
-        <div className="pt-2 max-w-lg mx-auto relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-900/40" size={18} />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search game, code or reward (e.g. Blox Fruits, EXP, Reset)..."
-            className="w-full pl-11 pr-4 py-3.5 bg-white border border-indigo-950/15 rounded-2xl text-sm font-semibold text-indigo-950 placeholder-indigo-900/40 focus:border-sapphire-600 focus:ring-2 focus:ring-sapphire-600/20 shadow-sm transition-all"
+        {/* Dynamic Search Autocomplete */}
+        <div className="pt-2 max-w-xl mx-auto">
+          <SearchAutocomplete
+            initialQuery={searchQuery}
+            onQueryChange={(q) => setSearchQuery(q)}
+            placeholder="Search game, code, or reward (e.g. Blox Fruits, EXP, Reset)..."
+            variant="compact"
           />
         </div>
 
@@ -364,6 +364,11 @@ export function CodesList() {
           </button>
         </div>
       )}
+
+      {/* Codes Page Dedicated Newsletter Card */}
+      <div className="mt-12 rounded-3xl bg-indigo-950 p-6 sm:p-8 text-white border border-white/10 shadow-xl">
+        <NewsletterForm variant="card" />
+      </div>
     </div>
   );
 }
