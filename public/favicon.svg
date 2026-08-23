@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="xGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" stroke="#38bdf8" stroke-width="8" />
+  
+  <!-- Controller / Pulse Core -->
+  <path d="M140 180 C 140 140, 372 140, 372 180 C 372 260, 420 340, 370 380 C 330 410, 300 340, 256 340 C 212 340, 182 410, 142 380 C 92 340, 140 260, 140 180 Z" fill="#030712" stroke="#38bdf8" stroke-width="12" opacity="0.85" />
+  
+  <!-- Stylized Neon X / Thunderbolt Pulse -->
+  <g filter="url(#glow)">
+    <!-- Diagonal 1 -->
+    <line x1="160" y1="160" x2="352" y2="352" stroke="url(#xGrad)" stroke-width="36" stroke-linecap="round" />
+    <!-- Diagonal 2 with Pulse Notch -->
+    <line x1="352" y1="160" x2="160" y2="352" stroke="url(#xGrad)" stroke-width="36" stroke-linecap="round" />
+    <!-- Center Energy Ring -->
+    <circle cx="256" cy="256" r="28" fill="#ffffff" stroke="#fbbf24" stroke-width="8" />
+  </g>
+</svg>

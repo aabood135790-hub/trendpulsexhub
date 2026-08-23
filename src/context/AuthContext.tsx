@@ -13,10 +13,26 @@ export const PROMO_CODES_REGISTRY: Record<string, { credits: number; title: stri
     credits: 300,
     title: 'Starter 300 Credits Bonus',
     description: 'Single-use booster grant of 300 Credits for instant avatar customization and game discussions.'
+  },
+  'SPIN-LUCKY-250': {
+    credits: 250,
+    title: 'Daily Spin Wheel VIP Drop',
+    description: 'VIP promo code won from the Daily Spin Wheel for +250 Gamer Credits!'
+  },
+  'JACKPOT-500': {
+    credits: 500,
+    title: 'Mega Jackpot Spin Winner',
+    description: 'Exclusive Grand Jackpot reward code for +500 Credits!'
+  },
+  'SPIN-BONUS-100': {
+    credits: 100,
+    title: 'Daily Spin Extra Booster',
+    description: 'Special Spin Booster code for +100 Credits!'
   }
 };
 
 const DAILY_GIFT_COOLDOWN_MS = 12 * 60 * 60 * 1000; // 12 Hours (43,200,000 ms)
+const DAILY_SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 Hours (86,400,000 ms)
 
 interface AuthContextType {
   user: { id: string; email?: string } | null;
@@ -27,6 +43,11 @@ interface AuthContextType {
   lastDailyClaimAt: string | null;
   isDailyGiftAvailable: boolean;
   remainingDailyClaimMs: number;
+  lastSpinClaimAt: string | null;
+  isDailySpinAvailable: boolean;
+  remainingDailySpinMs: number;
+  spinStreak: number;
+  extraSpinTickets: number;
   isAuthenticated: boolean;
   isLoading: boolean;
   isSupabaseLive: boolean;
@@ -43,8 +64,12 @@ interface AuthContextType {
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   uploadAvatar: (file: File) => Promise<string>;
   claimCredits: (amount?: number, source?: string) => Promise<{ success: boolean; newBalance: number; error?: string }>;
+  claimSpinReward: (options: { amount: number; sectorId: number; promoCode?: string; isDoubleBonus?: boolean }) => Promise<{ success: boolean; newBalance: number; error?: string }>;
+  grantExtraSpinTicket: () => Promise<void>;
+  useSpinTicket: () => Promise<boolean>;
   redeemPromoCode: (code: string) => Promise<{ success: boolean; creditsAdded: number; message: string; newBalance: number; error?: string }>;
   recordDailyClaim: () => Promise<void>;
+  recordSpinClaim: () => Promise<void>;
   deductCredits: (cost: number, actionType: string, description?: string) => Promise<{ success: boolean; newBalance: number; error?: string }>;
   hasEnoughCredits: (cost: number) => boolean;
   recordAvatarChange: () => Promise<number>;
@@ -71,7 +96,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const redeemedCodes = profile?.redeemed_codes ?? [];
   const lastDailyClaimAt = profile?.last_daily_claim_at ?? null;
 
-  // Real-time 12-hour cooldown ticker
+  // Local fallback storage for spin claim timestamp
+  const [localSpinTimestamp, setLocalSpinTimestamp] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('trendpulse_last_spin_claim');
+  });
+
+  const lastSpinClaimAt = profile?.last_spin_claim_at || localSpinTimestamp;
+  const spinStreak = profile?.spin_streak ?? 0;
+  const extraSpinTickets = profile?.extra_spin_tickets ?? 0;
+
+  // Real-time cooldown ticker for 12h Gift Box & 24h Spin Wheel
   const [nowTimestamp, setNowTimestamp] = useState<number>(Date.now());
 
   useEffect(() => {
@@ -87,6 +122,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const remainingDailyClaimMs = isDailyGiftAvailable
     ? 0
     : Math.max(0, DAILY_GIFT_COOLDOWN_MS - timeSinceLastClaimMs);
+
+  const lastSpinTimeMs = lastSpinClaimAt ? new Date(lastSpinClaimAt).getTime() : 0;
+  const timeSinceLastSpinMs = nowTimestamp - lastSpinTimeMs;
+  const isDailySpinAvailable = !lastSpinClaimAt || timeSinceLastSpinMs >= DAILY_SPIN_COOLDOWN_MS || extraSpinTickets > 0;
+  const remainingDailySpinMs = isDailySpinAvailable
+    ? 0
+    : Math.max(0, DAILY_SPIN_COOLDOWN_MS - timeSinceLastSpinMs);
 
   // Helper: Synchronize or auto-create Supabase Profile on Google sign-in
   const syncSupabaseProfile = async (authUser: any) => {
@@ -324,6 +366,147 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const payload: any = { credits: newBalance };
         if (isDaily) payload.last_daily_claim_at = nowIso;
         await supabase.from('profiles').update(payload).eq('id', profile.id);
+      } catch {}
+    }
+
+    return { success: true, newBalance };
+  };
+
+  // Record daily spin claim timestamp (enforces 24-hour timer)
+  const recordSpinClaim = async () => {
+    const nowIso = new Date().toISOString();
+    setLocalSpinTimestamp(nowIso);
+    localStorage.setItem('trendpulse_last_spin_claim', nowIso);
+
+    if (profile) {
+      const nextStreak = (profile.spin_streak || 0) + 1;
+      const updated: UserProfile = {
+        ...profile,
+        last_spin_claim_at: nowIso,
+        spin_streak: nextStreak,
+        updated_at: nowIso,
+      };
+      setProfile(updated);
+      localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
+
+      if (isSupabaseConfigured && profile.id) {
+        try {
+          await supabase.from('profiles').update({ 
+            last_spin_claim_at: nowIso,
+            spin_streak: nextStreak,
+          }).eq('id', profile.id);
+        } catch {}
+      }
+    }
+  };
+
+  // Grant an extra spin ticket (e.g. from Adsterra Direct Link bonus)
+  const grantExtraSpinTicket = async () => {
+    if (profile) {
+      const currentTickets = profile.extra_spin_tickets || 0;
+      const updated: UserProfile = {
+        ...profile,
+        extra_spin_tickets: currentTickets + 1,
+        updated_at: new Date().toISOString(),
+      };
+      setProfile(updated);
+      localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
+    }
+  };
+
+  // Consume a spin ticket if on cooldown
+  const useSpinTicket = async (): Promise<boolean> => {
+    if (profile && (profile.extra_spin_tickets || 0) > 0) {
+      const updated: UserProfile = {
+        ...profile,
+        extra_spin_tickets: (profile.extra_spin_tickets || 1) - 1,
+        updated_at: new Date().toISOString(),
+      };
+      setProfile(updated);
+      localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
+      return true;
+    }
+    return false;
+  };
+
+  // Claim Daily Spin Wheel Reward
+  const claimSpinReward = async (options: {
+    amount: number;
+    sectorId: number;
+    promoCode?: string;
+    isDoubleBonus?: boolean;
+  }): Promise<{ success: boolean; newBalance: number; error?: string }> => {
+    const { amount, sectorId, promoCode, isDoubleBonus = false } = options;
+    const current = profile?.credits ?? 0;
+    const finalAmount = amount * (isDoubleBonus ? 2 : 1);
+    const newBalance = current + finalAmount;
+    const nowIso = new Date().toISOString();
+
+    setLocalSpinTimestamp(nowIso);
+    localStorage.setItem('trendpulse_last_spin_claim', nowIso);
+
+    const currentRedeemed = Array.isArray(profile?.redeemed_codes) ? profile.redeemed_codes : [];
+    const updatedRedeemed = promoCode && !currentRedeemed.includes(promoCode)
+      ? [...currentRedeemed, promoCode]
+      : currentRedeemed;
+
+    if (profile) {
+      const nextStreak = (profile.spin_streak || 0) + 1;
+      const updated: UserProfile = {
+        ...profile,
+        credits: newBalance,
+        last_spin_claim_at: nowIso,
+        spin_streak: nextStreak,
+        redeemed_codes: updatedRedeemed,
+        updated_at: nowIso,
+      };
+      setProfile(updated);
+      localStorage.setItem('trendpulse_user_profile', JSON.stringify(updated));
+    }
+
+    // Attempt server sync
+    try {
+      if (profile?.id) {
+        const res = await fetch('/api/wallet/claim-spin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: profile.id,
+            sectorId,
+            amount,
+            promoCode,
+            isDoubleBonus,
+          }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.credits !== undefined && profile) {
+            const serverUpdated: UserProfile = {
+              ...profile,
+              credits: json.credits,
+              last_spin_claim_at: nowIso,
+              spin_streak: json.spin_streak || (profile.spin_streak || 0) + 1,
+              redeemed_codes: updatedRedeemed,
+            };
+            setProfile(serverUpdated);
+            localStorage.setItem('trendpulse_user_profile', JSON.stringify(serverUpdated));
+            return { success: true, newBalance: json.credits };
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Backend spin claim sync error:', err);
+    }
+
+    // Supabase fallback
+    if (isSupabaseConfigured && profile?.id) {
+      try {
+        await supabase.from('profiles').update({
+          credits: newBalance,
+          last_spin_claim_at: nowIso,
+          redeemed_codes: updatedRedeemed,
+          updated_at: nowIso,
+        }).eq('id', profile.id);
       } catch {}
     }
 
@@ -790,6 +973,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         lastDailyClaimAt,
         isDailyGiftAvailable,
         remainingDailyClaimMs,
+        lastSpinClaimAt,
+        isDailySpinAvailable,
+        remainingDailySpinMs,
+        spinStreak,
+        extraSpinTickets,
         isAuthenticated: !!profile,
         isLoading,
         isSupabaseLive: isSupabaseConfigured,
@@ -806,8 +994,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateProfile,
         uploadAvatar,
         claimCredits,
+        claimSpinReward,
+        grantExtraSpinTicket,
+        useSpinTicket,
         redeemPromoCode,
         recordDailyClaim,
+        recordSpinClaim,
         deductCredits,
         hasEnoughCredits,
         recordAvatarChange,

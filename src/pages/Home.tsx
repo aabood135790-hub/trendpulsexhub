@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowRight, Flame, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, Flame, Sparkles, Users, Trophy, Gift, Zap } from 'lucide-react';
 import { Post } from '../types';
 import { getPosts } from '../lib/mock-data';
 import { CodeGameCard } from '../components/ui/CodeGameCard';
@@ -9,6 +9,7 @@ import { ArticleCard } from '../components/ui/ArticleCard';
 import { BonusCodeCta } from '../components/ui/BonusCodeCta';
 import { UniversalAdSlot } from '../components/ads/UniversalAdSlot';
 import { usePageSEO } from '../lib/seo';
+import { useAuth } from '../context/AuthContext';
 
 export function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -161,6 +162,47 @@ export function Home() {
             <Link to="/codes" className="flex h-12 w-full items-center justify-center rounded-xl bg-azure-100 text-sm font-bold text-sapphire-700 hover:bg-azure-200 transition-colors">
               View All Roblox Codes Vault →
             </Link>
+          </div>
+        </section>
+
+        {/* Daily Lucky Spin Wheel Spotlight Section */}
+        <section className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-10 border-2 border-amber-400/40 shadow-2xl text-white">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 h-64 w-64 rounded-full bg-sky-500/20 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-3 max-w-2xl text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-black uppercase tracking-wider">
+                <Flame size={14} className="text-amber-400" />
+                <span>New Feature • 24-Hour Cooldown</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                Daily Lucky <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-white">Spin Wheel</span>
+              </h2>
+              <p className="text-sm sm:text-base text-azure-100/85 leading-relaxed font-medium">
+                Spin once every 24 hours to score free Gamer Credits, exclusive VIP promo codes, and 2X double bonus drops directly into your wallet balance.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-bold text-sky-200">
+                <span className="flex items-center gap-1.5 bg-indigo-900/60 px-3 py-1.5 rounded-xl border border-sky-400/20">
+                  <Trophy size={14} className="text-amber-400" /> Grand Jackpot: 500 Credits
+                </span>
+                <span className="flex items-center gap-1.5 bg-indigo-900/60 px-3 py-1.5 rounded-xl border border-sky-400/20">
+                  <Zap size={14} className="text-sky-400" /> 2X Double Bonus Multipliers
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+              <Link
+                to="/spin"
+                className="flex items-center gap-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-indigo-950 px-8 py-4 rounded-2xl font-black text-sm md:text-base shadow-[0_0_30px_rgba(245,158,11,0.5)] border border-amber-300/60 transition-all hover:scale-105 active:scale-95"
+              >
+                <Sparkles size={18} className="stroke-[2.5]" />
+                <span>SPIN THE WHEEL NOW</span>
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </Link>
+            </div>
           </div>
         </section>
 

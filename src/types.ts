@@ -65,6 +65,9 @@ export interface UserProfile {
   avatar_changes_count: number;
   redeemed_codes?: string[];
   last_daily_claim_at?: string | null;
+  last_spin_claim_at?: string | null;
+  spin_streak?: number;
+  extra_spin_tickets?: number;
   created_at?: string;
   updated_at?: string;
 }

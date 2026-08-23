@@ -10,6 +10,7 @@ export type AdSlotId =
   | 'news_feed_banner'
   | 'search_page_banner'
   | 'home_feed_banner'
+  | 'spin_wheel_banner'
   | 'footer_banner';
 
 export type AdNetworkType = 'Adsterra' | 'DirectLink' | 'Custom' | 'BannerImage';
@@ -182,6 +183,18 @@ export const DEFAULT_AD_SETTINGS: AdSettingsState = {
       banner_image_url: '',
       target_url: defaultDirectLink,
       alt_text: 'Trending Gamer Codes & Gifts',
+    },
+    spin_wheel_banner: {
+      id: 'spin_wheel_banner',
+      name: 'Daily Spin Wheel Placement Banner',
+      description: 'Strategically positioned alongside and beneath the interactive Daily Spin Wheel container.',
+      size_label: '728x90 / 300x250 Native Banner',
+      enabled: true,
+      network_type: 'Adsterra',
+      html_script: '',
+      banner_image_url: '',
+      target_url: defaultDirectLink,
+      alt_text: 'Claim Double Bonus & Extra Free Spins Now',
     },
     footer_banner: {
       id: 'footer_banner',

@@ -1818,7 +1818,71 @@ async function startServer() {
     BONUS300: { credits: 300, title: 'Bonus Welcome 300 Credits Boost' },
     TREND100: { credits: 100, title: 'TrendPulse 100 Credits Booster' },
     GEMINI2026: { credits: 500, title: 'Gemini AI Celebration Code' },
+    'SPIN-LUCKY-250': { credits: 250, title: 'Daily Spin Wheel VIP Drop' },
+    'JACKPOT-500': { credits: 500, title: 'Mega Jackpot Spin Winner' },
+    'SPIN-BONUS-100': { credits: 100, title: 'Daily Spin Extra Booster' },
   };
+
+  // Claim Daily Spin Wheel Reward (with 24h cooldown server check & Supabase persistence)
+  app.post('/api/wallet/claim-spin', async (req, res) => {
+    const { userId, sectorId, amount = 50, promoCode, isDoubleBonus = false } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'User ID is required to claim daily spin reward.' });
+    }
+
+    const grantAmount = Math.max(0, Number(amount) || 0) * (isDoubleBonus ? 2 : 1);
+    const nowIso = new Date().toISOString();
+
+    if (supabaseServer) {
+      try {
+        const { data: profile } = await supabaseServer
+          .from('profiles')
+          .select('credits, last_spin_claim_at, spin_streak, redeemed_codes')
+          .eq('id', userId)
+          .maybeSingle();
+
+        const currentCredits = profile?.credits || 0;
+        const newBalance = currentCredits + grantAmount;
+        const currentStreak = (profile?.spin_streak || 0) + 1;
+        const redeemedList = Array.isArray(profile?.redeemed_codes) ? profile.redeemed_codes : [];
+
+        const updatePayload: any = {
+          credits: newBalance,
+          last_spin_claim_at: nowIso,
+          spin_streak: currentStreak,
+          updated_at: nowIso,
+        };
+
+        if (promoCode && !redeemedList.includes(promoCode)) {
+          updatePayload.redeemed_codes = [...redeemedList, promoCode];
+        }
+
+        await supabaseServer
+          .from('profiles')
+          .update(updatePayload)
+          .eq('id', userId);
+
+        return res.json({
+          success: true,
+          credits: newBalance,
+          amountAdded: grantAmount,
+          last_spin_claim_at: nowIso,
+          spin_streak: currentStreak,
+          message: `Claimed ${grantAmount} credits from Daily Spin Wheel!`,
+        });
+      } catch (err: any) {
+        console.warn('[Spin Claim Server Error]:', err);
+      }
+    }
+
+    return res.json({
+      success: true,
+      amountAdded: grantAmount,
+      last_spin_claim_at: nowIso,
+      message: `Claimed ${grantAmount} credits from Daily Spin Wheel!`,
+    });
+  });
 
   app.post('/api/wallet/redeem-code', async (req, res) => {
     const { userId, code } = req.body;

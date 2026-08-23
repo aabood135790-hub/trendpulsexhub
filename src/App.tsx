@@ -11,6 +11,7 @@ import { Community } from './pages/Community';
 import { NewsList } from './pages/NewsList';
 import { ModsList } from './pages/ModsList';
 import { Search } from './pages/Search';
+import { DailySpin } from './pages/DailySpin';
 import { PostView } from './pages/PostView';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="mods" element={<ModsList />} />
                 <Route path="mods/:slug" element={<PostView />} />
                 <Route path="search" element={<Search />} />
+                <Route path="spin" element={<DailySpin />} />
                 <Route path="post/:slug" element={<PostView />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsOfService />} />

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Search, Menu, X, Gamepad2, User, Users, Coins, Sparkles, Plus, Command } from 'lucide-react';
+import { Search, Menu, X, Gamepad2, User, Users, Coins, Sparkles, Plus, Command, Trophy } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,7 @@ import { SearchModal } from '../search/SearchModal';
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Codes', path: '/codes' },
+  { name: 'Spin & Win', path: '/spin', isHighlight: true },
   { name: 'Community', path: '/community' },
   { name: 'News', path: '/news' },
   { name: 'Mods', path: '/mods' },
@@ -62,7 +63,13 @@ export function Navbar() {
                 {({ isActive }) => (
                   <>
                     {item.name === 'Community' && <Users size={14} className={isActive ? 'text-sapphire-600' : 'text-indigo-900/50'} />}
+                    {item.name === 'Spin & Win' && <Trophy size={14} className="text-amber-500 animate-bounce" />}
                     {item.name}
+                    {item.name === 'Spin & Win' && (
+                      <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-amber-400 text-indigo-950 shadow-xs">
+                        24h
+                      </span>
+                    )}
                     {isActive && (
                       <motion.div
                         layoutId="navbar-indicator"
@@ -241,11 +248,17 @@ export function Navbar() {
                 >
                   <span className="flex items-center gap-2.5">
                     {item.name === 'Community' && <Users size={18} className="text-sapphire-600" />}
+                    {item.name === 'Spin & Win' && <Trophy size={18} className="text-amber-500" />}
                     {item.name}
                   </span>
                   {item.name === 'Community' && (
                     <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-sapphire-600 text-white">
                       Hub
+                    </span>
+                  )}
+                  {item.name === 'Spin & Win' && (
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-indigo-950 font-black">
+                      24h Spin
                     </span>
                   )}
                 </NavLink>

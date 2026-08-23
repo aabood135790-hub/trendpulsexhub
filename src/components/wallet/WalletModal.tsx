@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Coins, 
@@ -13,10 +14,13 @@ import {
   Tag, 
   KeyRound, 
   AlertCircle, 
-  ClipboardPaste 
+  ClipboardPaste,
+  Trophy,
+  Flame
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useRewardModal } from '../../context/RewardModalContext';
+import { formatSpinCooldown } from '../../lib/spinConfig';
 
 function formatCooldown(ms: number): { formatted: string; hours: number; minutes: number; seconds: number; progressPct: number } {
   if (ms <= 0) return { formatted: '00:00:00', hours: 0, minutes: 0, seconds: 0, progressPct: 100 };
@@ -40,6 +44,7 @@ function formatCooldown(ms: number): { formatted: string; hours: number; minutes
 }
 
 export function WalletModal() {
+  const navigate = useNavigate();
   const { 
     credits, 
     avatarChangesCount, 
@@ -48,6 +53,10 @@ export function WalletModal() {
     claimCredits, 
     isDailyGiftAvailable, 
     remainingDailyClaimMs, 
+    isDailySpinAvailable,
+    remainingDailySpinMs,
+    spinStreak,
+    extraSpinTickets,
     redeemedCodes, 
     redeemPromoCode 
   } = useAuth();
@@ -64,6 +73,12 @@ export function WalletModal() {
   const [redeemErrorMsg, setRedeemErrorMsg] = useState<string | null>(null);
 
   const cooldown = formatCooldown(remainingDailyClaimMs);
+  const spinCooldown = formatSpinCooldown(remainingDailySpinMs);
+
+  const handleOpenSpinWheel = () => {
+    closeWalletModal();
+    navigate('/spin');
+  };
 
   const handleClaimRewardBox = async () => {
     if (!isDailyGiftAvailable) return;
@@ -265,6 +280,43 @@ export function WalletModal() {
                 <span>+100 Credits successfully claimed! 12-hour timer started.</span>
               </motion.div>
             )}
+
+            {/* SECTION 1.5: Daily Lucky Spin Wheel (24-Hour Cooldown) */}
+            <div className="my-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-2 border-amber-400/40 p-4 sm:p-5 relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5 text-center sm:text-left">
+                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-indigo-950 flex items-center justify-center font-black shadow-md shadow-amber-500/20 shrink-0">
+                    <Trophy size={24} className="stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-600">
+                      <Flame size={13} className="text-amber-500 stroke-[2.5]" />
+                      <span>24-Hour Lucky Drop</span>
+                      {extraSpinTickets > 0 && (
+                        <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                          +{extraSpinTickets} EXTRA
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-base font-black text-indigo-950">Daily Spin Wheel</h4>
+                    <p className="text-xs text-indigo-900/70">
+                      {isDailySpinAvailable || extraSpinTickets > 0 
+                        ? 'Your free spin is ready! Win up to 500 Credits & VIP codes.' 
+                        : `Next free spin unlocks in ${spinCooldown.formatted}`}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleOpenSpinWheel}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-indigo-950 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                >
+                  <Sparkles size={16} className="stroke-[2.5]" />
+                  <span>{isDailySpinAvailable || extraSpinTickets > 0 ? 'SPIN NOW' : 'VIEW WHEEL'}</span>
+                  <ArrowRight size={15} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
 
             {/* SECTION 2: Redeem Code Feature */}
             <div className="my-4 rounded-2xl bg-azure-50/80 border border-indigo-950/10 p-4 sm:p-5">
