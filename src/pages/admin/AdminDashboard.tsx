@@ -13,12 +13,13 @@ import { getGameIconUrl, getGameRepresentativeImage } from '../../lib/gameImages
 import { useAds } from '../../context/AdContext';
 import { AdSlotId, AdSlotConfig } from '../../lib/adConfig';
 import { AISettingsPanel } from '../../components/admin/AISettingsPanel';
+import { AIAssistantPanel } from '../../components/admin/AIAssistantPanel';
 import { SEOMetaTagsPanel } from '../../components/admin/SEOMetaTagsPanel';
 import { AvatarManagerPanel } from '../../components/admin/AvatarManagerPanel';
 import { AdminSecurityPanel } from '../../components/admin/AdminSecurityPanel';
 import { AdminAnalyticsPanel } from '../../components/admin/AdminAnalyticsPanel';
 
-type AdminTab = 'analytics' | 'posts' | 'ads' | 'seo' | 'viral-trends' | 'avatar' | 'security' | 'ai-settings' | 'inquiries';
+type AdminTab = 'analytics' | 'ai-assistant' | 'posts' | 'ads' | 'seo' | 'viral-trends' | 'avatar' | 'security' | 'ai-settings' | 'inquiries';
 
 export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>('analytics');
@@ -276,6 +277,17 @@ export function AdminDashboard() {
         </button>
 
         <button
+          onClick={() => setActiveTab('ai-assistant')}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'ai-assistant'
+              ? 'bg-gradient-to-r from-sapphire-600 via-sky-600 to-indigo-700 text-white shadow-md shadow-sapphire-600/25 ring-2 ring-sky-400/40'
+              : 'bg-white hover:bg-azure-50 text-indigo-900/70 border border-indigo-950/10'
+          }`}
+        >
+          <Bot size={15} className="text-sky-400" /> AI Copilot &amp; Assistant
+        </button>
+
+        <button
           onClick={() => setActiveTab('posts')}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'posts'
@@ -426,6 +438,11 @@ export function AdminDashboard() {
       {/* TAB 0: SITE ANALYTICS & VISITOR COUNTERS */}
       {activeTab === 'analytics' && (
         <AdminAnalyticsPanel />
+      )}
+
+      {/* TAB 0.5: AI COPILOT & OPERATIONS ASSISTANT */}
+      {activeTab === 'ai-assistant' && (
+        <AIAssistantPanel />
       )}
 
       {/* TAB 1: ALL POSTS */}

@@ -11,6 +11,38 @@ dotenv.config({ path: '.env.local' });
 // Global in-memory cache for generated viral trends & articles
 const inMemoryGeneratedPosts: any[] = [];
 
+// Rolling in-memory diagnostic log (last 30 operations)
+export interface AIDiagnosticLog {
+  id: string;
+  timestamp: string;
+  provider: 'gemini' | 'deepseek';
+  modelId: string;
+  action: 'test_connection' | 'chat_message' | 'model_discovery' | 'scrape_codes' | 'generate_article';
+  httpStatus: number;
+  success: boolean;
+  latencyMs: number;
+  errorCategory?: 'API_KEY_MISSING' | 'INVALID_API_KEY' | 'MODEL_UNAVAILABLE' | 'RATE_LIMIT_EXCEEDED' | 'PROVIDER_UNAVAILABLE' | 'INVALID_REQUEST' | 'SERVER_ERROR' | 'NONE';
+  errorMessage?: string;
+  details?: string;
+}
+
+const aiDiagnosticLogs: AIDiagnosticLog[] = [];
+
+function recordAIDiagnostic(log: Omit<AIDiagnosticLog, 'id' | 'timestamp'>) {
+  const entry: AIDiagnosticLog = {
+    ...log,
+    id: `diag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    timestamp: new Date().toISOString(),
+    // Strictly sanitize: ensure no secrets or keys are stored
+    errorMessage: log.errorMessage ? log.errorMessage.replace(/AIza[0-9A-Za-z-_]{20,}/g, '[REDACTED_GEMINI_KEY]').replace(/sk-[0-9A-Za-z-_]{20,}/g, '[REDACTED_DEEPSEEK_KEY]').slice(0, 300) : undefined,
+    details: log.details ? log.details.replace(/AIza[0-9A-Za-z-_]{20,}/g, '[REDACTED_GEMINI_KEY]').replace(/sk-[0-9A-Za-z-_]{20,}/g, '[REDACTED_DEEPSEEK_KEY]').slice(0, 200) : undefined,
+  };
+  aiDiagnosticLogs.unshift(entry);
+  if (aiDiagnosticLogs.length > 30) {
+    aiDiagnosticLogs.pop();
+  }
+}
+
 // =========================================================================
 // 1. AI SERVICE & API KEYS CONFIGURATION (GEMINI & DEEPSEEK)
 // =========================================================================
@@ -29,7 +61,7 @@ let activeAISettings: AIServiceSettings = {
   deepseekApiKey: process.env.DEEPSEEK_API_KEY || '',
   primaryProvider: 'gemini',
   fallbackEnabled: true,
-  geminiModel: 'gemini-3.7-flash',
+  geminiModel: 'gemini-3.6-flash',
   deepseekModel: 'deepseek-chat',
   updatedAt: new Date().toISOString(),
 };
@@ -201,7 +233,7 @@ async function loadAISettingsFromDB() {
         deepseekApiKey: val.deepseekApiKey !== undefined ? String(val.deepseekApiKey).trim() : (process.env.DEEPSEEK_API_KEY || ''),
         primaryProvider: val.primaryProvider === 'deepseek' ? 'deepseek' : 'gemini',
         fallbackEnabled: val.fallbackEnabled !== false,
-        geminiModel: val.geminiModel || 'gemini-3.7-flash',
+        geminiModel: val.geminiModel || 'gemini-3.6-flash',
         deepseekModel: val.deepseekModel || 'deepseek-chat',
         updatedAt: val.updatedAt || new Date().toISOString(),
       };
@@ -401,11 +433,11 @@ Rules:
 4. Return structured JSON with game name and array of codes.`;
 
   const modelsToTry = [
-    activeAISettings.geminiModel || 'gemini-3.7-flash',
+    activeAISettings.geminiModel || 'gemini-3.6-flash',
+    'gemini-3.6-flash',
     'gemini-3.1-flash-lite',
     'gemini-flash-latest',
-    'gemini-2.5-flash',
-    'gemini-1.5-flash',
+    'gemini-3-flash-preview',
   ];
 
   for (const model of modelsToTry) {
@@ -414,7 +446,6 @@ Rules:
         model,
         contents: prompt,
         config: {
-          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           systemInstruction: 'You are an authoritative gaming codes scraper and database curator. Output accurate structured JSON promo codes.',
           responseMimeType: 'application/json',
           responseSchema: {
@@ -742,11 +773,11 @@ Make sure every title is extremely catchy, high-impact, and click-worthy (e.g. "
 Return structured JSON with comprehensive HTML formatted content_text for each article.`;
 
   const modelsToTry = [
-    activeAISettings.geminiModel || 'gemini-3.7-flash',
+    activeAISettings.geminiModel || 'gemini-3.6-flash',
+    'gemini-3.6-flash',
     'gemini-3.1-flash-lite',
     'gemini-flash-latest',
-    'gemini-2.5-flash',
-    'gemini-1.5-flash',
+    'gemini-3-flash-preview',
   ];
 
   for (const model of modelsToTry) {
@@ -755,7 +786,6 @@ Return structured JSON with comprehensive HTML formatted content_text for each a
         model,
         contents: prompt,
         config: {
-          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           systemInstruction: 'You are an authoritative viral Roblox gaming trend writer. Return high-energy, click-worthy, realistic Roblox trend articles with structured promo codes.',
           responseMimeType: 'application/json',
           responseSchema: {
@@ -1239,7 +1269,7 @@ async function startServer() {
       deepseekApiKey: activeAISettings.deepseekApiKey || '',
       primaryProvider: activeAISettings.primaryProvider || 'gemini',
       fallbackEnabled: activeAISettings.fallbackEnabled !== false,
-      geminiModel: activeAISettings.geminiModel || 'gemini-3.7-flash',
+      geminiModel: activeAISettings.geminiModel || 'gemini-3.6-flash',
       deepseekModel: activeAISettings.deepseekModel || 'deepseek-chat',
       hasGeminiKey: !!(activeAISettings.geminiApiKey || envHasGemini),
       hasDeepseekKey: !!(activeAISettings.deepseekApiKey || envHasDeepseek),
@@ -1256,7 +1286,7 @@ async function startServer() {
       deepseekApiKey = '',
       primaryProvider = 'gemini',
       fallbackEnabled = true,
-      geminiModel = 'gemini-3.7-flash',
+      geminiModel = 'gemini-3.6-flash',
       deepseekModel = 'deepseek-chat',
     } = req.body;
 
@@ -1265,7 +1295,7 @@ async function startServer() {
       deepseekApiKey: String(deepseekApiKey || '').trim(),
       primaryProvider: primaryProvider === 'deepseek' ? 'deepseek' : 'gemini',
       fallbackEnabled: fallbackEnabled !== false,
-      geminiModel: String(geminiModel || 'gemini-3.7-flash').trim(),
+      geminiModel: String(geminiModel || 'gemini-3.6-flash').trim(),
       deepseekModel: String(deepseekModel || 'deepseek-chat').trim(),
       updatedAt: new Date().toISOString(),
     };
@@ -1308,7 +1338,277 @@ async function startServer() {
     });
   });
 
-  // 1d. Live Test AI Connection (Gemini or DeepSeek)
+  // 1d. Dynamic Server-Side Model Discovery & Verification (Gemini & DeepSeek)
+  app.get('/api/admin/models', async (req, res) => {
+    const provider = req.query.provider as string | undefined;
+    const results: any = { success: true, timestamp: new Date().toISOString() };
+
+    // 1. Google Gemini Discovery
+    if (!provider || provider === 'gemini') {
+      const gemKey = (activeAISettings.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
+      if (!gemKey) {
+        results.gemini = {
+          success: false,
+          provider: 'gemini',
+          status: 'UNCONFIGURED',
+          errorCategory: 'API_KEY_MISSING',
+          message: 'No Google Gemini API key configured. Please enter a valid API key.',
+          models: [],
+        };
+      } else {
+        const startTime = Date.now();
+        try {
+          const client = new GoogleGenAI({
+            apiKey: gemKey,
+            httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
+          });
+
+          const rawList = await client.models.list();
+          const discoveredModels: any[] = [];
+          
+          for await (const m of rawList) {
+            const rawName = m.name || '';
+            const cleanId = rawName.replace(/^models\//, '');
+            
+            // Filter to text / multimodal generation models
+            const isGemini = cleanId.startsWith('gemini') || cleanId.startsWith('gemma');
+            const hasGenCapability = !m.supportedActions || m.supportedActions.includes('generateContent') || (m as any).supportedGenerationMethods?.includes('generateContent');
+
+            // Skip known deprecated models that return 404
+            const isDeprecated = cleanId === 'gemini-2.5-flash' || cleanId === 'gemini-2.5-pro' || cleanId.includes('preview-tts');
+
+            if (isGemini && hasGenCapability && !isDeprecated) {
+              const isRecommended = cleanId === 'gemini-3.6-flash' || cleanId === 'gemini-flash-latest' || cleanId === 'gemini-3.1-flash-lite';
+              discoveredModels.push({
+                id: cleanId,
+                name: rawName,
+                displayName: m.displayName || cleanId,
+                description: m.description || (isRecommended ? 'Flagship high-speed model with structured JSON support' : 'Official Gemini generation model'),
+                provider: 'gemini',
+                isRecommended,
+                contextWindow: m.inputTokenLimit ? `${Math.round(m.inputTokenLimit / 1000)}k tokens` : '1M tokens',
+                status: 'available',
+              });
+            }
+          }
+
+          // Sort recommended to top, then alphabetical
+          discoveredModels.sort((a, b) => {
+            if (a.isRecommended && !b.isRecommended) return -1;
+            if (!a.isRecommended && b.isRecommended) return 1;
+            return a.displayName.localeCompare(b.displayName);
+          });
+
+          // Ensure default recommendation if list is filtered
+          if (discoveredModels.length === 0) {
+            discoveredModels.push(
+              { id: 'gemini-3.6-flash', displayName: 'Gemini 3.6 Flash (Recommended)', description: 'High-speed flagship with JSON schema support', provider: 'gemini', isRecommended: true, status: 'available' },
+              { id: 'gemini-3.1-flash-lite', displayName: 'Gemini 3.1 Flash Lite', description: 'Ultra-low latency generation model', provider: 'gemini', isRecommended: true, status: 'available' },
+              { id: 'gemini-flash-latest', displayName: 'Gemini Flash Latest', description: 'Latest stable flash alias', provider: 'gemini', isRecommended: true, status: 'available' }
+            );
+          }
+
+          const latencyMs = Date.now() - startTime;
+          results.gemini = {
+            success: true,
+            provider: 'gemini',
+            status: 'CONNECTED',
+            modelCount: discoveredModels.length,
+            latencyMs,
+            models: discoveredModels,
+            activeModel: activeAISettings.geminiModel || 'gemini-3.6-flash',
+          };
+
+          recordAIDiagnostic({
+            provider: 'gemini',
+            modelId: activeAISettings.geminiModel || 'gemini-3.6-flash',
+            action: 'model_discovery',
+            httpStatus: 200,
+            success: true,
+            latencyMs,
+            errorCategory: 'NONE',
+            details: `Discovered ${discoveredModels.length} models via Gemini API`,
+          });
+        } catch (err: any) {
+          const latencyMs = Date.now() - startTime;
+          const status = err?.status || 500;
+          let category: any = 'PROVIDER_UNAVAILABLE';
+          if (status === 400 || status === 401 || status === 403 || (err?.message && err.message.includes('API key'))) {
+            category = 'INVALID_API_KEY';
+          } else if (status === 429) {
+            category = 'RATE_LIMIT_EXCEEDED';
+          }
+
+          results.gemini = {
+            success: false,
+            provider: 'gemini',
+            status: 'ERROR',
+            httpStatus: status,
+            errorCategory: category,
+            error: err?.message ? err.message.replace(/AIza[0-9A-Za-z-_]{20,}/g, '[KEY]') : 'Failed to query Gemini models API',
+            models: [],
+          };
+
+          recordAIDiagnostic({
+            provider: 'gemini',
+            modelId: activeAISettings.geminiModel || 'gemini-3.6-flash',
+            action: 'model_discovery',
+            httpStatus: status,
+            success: false,
+            latencyMs,
+            errorCategory: category,
+            errorMessage: err?.message,
+          });
+        }
+      }
+    }
+
+    // 2. DeepSeek Discovery
+    if (!provider || provider === 'deepseek') {
+      const dsKey = (activeAISettings.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '').trim();
+      if (!dsKey) {
+        results.deepseek = {
+          success: false,
+          provider: 'deepseek',
+          status: 'UNCONFIGURED',
+          errorCategory: 'API_KEY_MISSING',
+          message: 'No DeepSeek API key configured. Please enter a valid API key.',
+          models: [],
+        };
+      } else {
+        const startTime = Date.now();
+        try {
+          const resp = await fetch('https://api.deepseek.com/models', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${dsKey}`,
+            },
+          });
+
+          const latencyMs = Date.now() - startTime;
+          if (resp.ok) {
+            const data = await resp.json();
+            const rawModels = Array.isArray(data?.data) ? data.data : [];
+            const deepseekModels = rawModels.map((m: any) => {
+              const id = m.id || 'deepseek-chat';
+              const isReasoner = id.includes('reasoner');
+              return {
+                id,
+                name: id,
+                displayName: isReasoner ? 'DeepSeek-R1 (Reasoner)' : 'DeepSeek-V3 (Chat)',
+                description: isReasoner
+                  ? 'Deep reasoning model with native chain-of-thought processing (64k context)'
+                  : 'High-speed general purpose conversational and structured content model (64k context)',
+                provider: 'deepseek',
+                isRecommended: !isReasoner,
+                contextWindow: '64k tokens',
+                status: 'available',
+              };
+            });
+
+            // Ensure baseline if empty
+            if (deepseekModels.length === 0) {
+              deepseekModels.push(
+                { id: 'deepseek-chat', displayName: 'DeepSeek-V3 (Chat)', description: 'Standard fast model', provider: 'deepseek', isRecommended: true, status: 'available' },
+                { id: 'deepseek-reasoner', displayName: 'DeepSeek-R1 (Reasoner)', description: 'Deep reasoning model', provider: 'deepseek', isRecommended: false, status: 'available' }
+              );
+            }
+
+            results.deepseek = {
+              success: true,
+              provider: 'deepseek',
+              status: 'CONNECTED',
+              modelCount: deepseekModels.length,
+              latencyMs,
+              models: deepseekModels,
+              activeModel: activeAISettings.deepseekModel || 'deepseek-chat',
+            };
+
+            recordAIDiagnostic({
+              provider: 'deepseek',
+              modelId: activeAISettings.deepseekModel || 'deepseek-chat',
+              action: 'model_discovery',
+              httpStatus: 200,
+              success: true,
+              latencyMs,
+              errorCategory: 'NONE',
+              details: `Discovered ${deepseekModels.length} models via DeepSeek API`,
+            });
+          } else {
+            const errorText = await resp.text();
+            let errorJson: any = null;
+            try { errorJson = JSON.parse(errorText); } catch {}
+
+            let category: any = 'PROVIDER_UNAVAILABLE';
+            if (resp.status === 401 || resp.status === 403) {
+              category = 'INVALID_API_KEY';
+            } else if (resp.status === 429) {
+              category = 'RATE_LIMIT_EXCEEDED';
+            }
+
+            const cleanMsg = errorJson?.error?.message || `DeepSeek API returned HTTP ${resp.status}`;
+
+            results.deepseek = {
+              success: false,
+              provider: 'deepseek',
+              status: 'ERROR',
+              httpStatus: resp.status,
+              errorCategory: category,
+              error: cleanMsg,
+              models: [],
+            };
+
+            recordAIDiagnostic({
+              provider: 'deepseek',
+              modelId: activeAISettings.deepseekModel || 'deepseek-chat',
+              action: 'model_discovery',
+              httpStatus: resp.status,
+              success: false,
+              latencyMs,
+              errorCategory: category,
+              errorMessage: cleanMsg,
+            });
+          }
+        } catch (err: any) {
+          const latencyMs = Date.now() - startTime;
+          results.deepseek = {
+            success: false,
+            provider: 'deepseek',
+            status: 'ERROR',
+            httpStatus: 500,
+            errorCategory: 'PROVIDER_UNAVAILABLE',
+            error: err?.message || 'Network error querying DeepSeek models endpoint',
+            models: [],
+          };
+
+          recordAIDiagnostic({
+            provider: 'deepseek',
+            modelId: activeAISettings.deepseekModel || 'deepseek-chat',
+            action: 'model_discovery',
+            httpStatus: 500,
+            success: false,
+            latencyMs,
+            errorCategory: 'PROVIDER_UNAVAILABLE',
+            errorMessage: err?.message,
+          });
+        }
+      }
+    }
+
+    return res.json(results);
+  });
+
+  // 1e. Safe Diagnostics History Log Endpoint
+  app.get('/api/admin/ai-diagnostics', async (req, res) => {
+    return res.json({
+      success: true,
+      count: aiDiagnosticLogs.length,
+      logs: aiDiagnosticLogs,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // 1f. Live Test AI Connection (Gemini or DeepSeek with clean latency & error categorization)
   app.post('/api/admin/test-ai-connection', async (req, res) => {
     const { provider = 'gemini', apiKey = '', model = '' } = req.body;
     const startTime = Date.now();
@@ -1316,51 +1616,128 @@ async function startServer() {
     if (provider === 'deepseek') {
       const testKey = (apiKey || activeAISettings.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '').trim();
       if (!testKey) {
+        recordAIDiagnostic({
+          provider: 'deepseek',
+          modelId: model || 'deepseek-chat',
+          action: 'test_connection',
+          httpStatus: 400,
+          success: false,
+          latencyMs: 0,
+          errorCategory: 'API_KEY_MISSING',
+          errorMessage: 'No DeepSeek API key provided',
+        });
+
         return res.status(400).json({
           success: false,
           provider: 'deepseek',
+          modelId: model || 'deepseek-chat',
+          httpStatus: 400,
+          errorCategory: 'API_KEY_MISSING',
+          latencyMs: 0,
+          timestamp: new Date().toISOString(),
           error: 'No DeepSeek API Key provided or configured. Please enter a valid key.',
         });
       }
 
+      const testModel = model || activeAISettings.deepseekModel || 'deepseek-chat';
+
       try {
-        const testModel = model || activeAISettings.deepseekModel || 'deepseek-chat';
         const responseText = await callDeepSeekChat(
           [{ role: 'user', content: 'Respond with exactly the single word "CONNECTED".' }],
-          { apiKey: testKey, model: testModel, temperature: 0.1 }
+          { apiKey: testKey, model: testModel, temperature: 0.1, timeoutMs: 15000 }
         );
 
         const latencyMs = Date.now() - startTime;
+        recordAIDiagnostic({
+          provider: 'deepseek',
+          modelId: testModel,
+          action: 'test_connection',
+          httpStatus: 200,
+          success: true,
+          latencyMs,
+          errorCategory: 'NONE',
+          details: `Connected successfully in ${latencyMs}ms`,
+        });
+
         return res.json({
           success: true,
           provider: 'deepseek',
-          model: testModel,
+          modelId: testModel,
+          httpStatus: 200,
           latencyMs,
+          timestamp: new Date().toISOString(),
           message: `DeepSeek API (${testModel}) connected successfully in ${latencyMs}ms!`,
-          sampleResponse: responseText.slice(0, 100).trim(),
+          sampleResponse: responseText.slice(0, 80).trim(),
         });
       } catch (err: any) {
         const latencyMs = Date.now() - startTime;
-        return res.status(500).json({
+        const msg = err?.message || 'DeepSeek API connection failed';
+        let category: any = 'PROVIDER_UNAVAILABLE';
+        let httpStatus = 500;
+
+        if (msg.includes('Authentication') || msg.includes('401') || msg.includes('invalid') || msg.includes('key')) {
+          category = 'INVALID_API_KEY';
+          httpStatus = 401;
+        } else if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit')) {
+          category = 'RATE_LIMIT_EXCEEDED';
+          httpStatus = 429;
+        } else if (msg.includes('404') || msg.includes('model')) {
+          category = 'MODEL_UNAVAILABLE';
+          httpStatus = 404;
+        }
+
+        recordAIDiagnostic({
+          provider: 'deepseek',
+          modelId: testModel,
+          action: 'test_connection',
+          httpStatus,
+          success: false,
+          latencyMs,
+          errorCategory: category,
+          errorMessage: msg,
+        });
+
+        return res.status(httpStatus).json({
           success: false,
           provider: 'deepseek',
+          modelId: testModel,
+          httpStatus,
+          errorCategory: category,
           latencyMs,
-          error: err?.message || 'DeepSeek API connection failed',
+          timestamp: new Date().toISOString(),
+          error: msg,
         });
       }
     } else {
       // Gemini Test
       const testKey = (apiKey || activeAISettings.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
       if (!testKey) {
+        recordAIDiagnostic({
+          provider: 'gemini',
+          modelId: model || 'gemini-3.6-flash',
+          action: 'test_connection',
+          httpStatus: 400,
+          success: false,
+          latencyMs: 0,
+          errorCategory: 'API_KEY_MISSING',
+          errorMessage: 'No Gemini API key provided',
+        });
+
         return res.status(400).json({
           success: false,
           provider: 'gemini',
-          error: 'No Gemini API Key provided or configured. Please enter a valid key.',
+          modelId: model || 'gemini-3.6-flash',
+          httpStatus: 400,
+          errorCategory: 'API_KEY_MISSING',
+          latencyMs: 0,
+          timestamp: new Date().toISOString(),
+          error: 'No Google Gemini API Key provided or configured. Please enter a valid key.',
         });
       }
 
+      const testModel = model || activeAISettings.geminiModel || 'gemini-3.6-flash';
+
       try {
-        const testModel = model || activeAISettings.geminiModel || 'gemini-3.7-flash';
         const testClient = new GoogleGenAI({
           apiKey: testKey,
           httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
@@ -1372,24 +1749,423 @@ async function startServer() {
         });
 
         const latencyMs = Date.now() - startTime;
+        recordAIDiagnostic({
+          provider: 'gemini',
+          modelId: testModel,
+          action: 'test_connection',
+          httpStatus: 200,
+          success: true,
+          latencyMs,
+          errorCategory: 'NONE',
+          details: `Connected successfully in ${latencyMs}ms`,
+        });
+
         return res.json({
           success: true,
           provider: 'gemini',
-          model: testModel,
+          modelId: testModel,
+          httpStatus: 200,
           latencyMs,
-          message: `Gemini API (${testModel}) connected successfully in ${latencyMs}ms!`,
-          sampleResponse: (resp.text || '').slice(0, 100).trim(),
+          timestamp: new Date().toISOString(),
+          message: `Google Gemini API (${testModel}) connected successfully in ${latencyMs}ms!`,
+          sampleResponse: (resp.text || '').slice(0, 80).trim(),
         });
       } catch (err: any) {
         const latencyMs = Date.now() - startTime;
+        const msg = err?.message || 'Gemini API connection failed';
+        let category: any = 'PROVIDER_UNAVAILABLE';
+        let httpStatus = err?.status || 500;
+
+        if (httpStatus === 400 || httpStatus === 401 || httpStatus === 403 || msg.includes('API key')) {
+          category = 'INVALID_API_KEY';
+        } else if (httpStatus === 404 || msg.includes('not found') || msg.includes('no longer available')) {
+          category = 'MODEL_UNAVAILABLE';
+        } else if (httpStatus === 429 || msg.includes('quota') || msg.includes('Resource has been exhausted')) {
+          category = 'RATE_LIMIT_EXCEEDED';
+        }
+
+        recordAIDiagnostic({
+          provider: 'gemini',
+          modelId: testModel,
+          action: 'test_connection',
+          httpStatus,
+          success: false,
+          latencyMs,
+          errorCategory: category,
+          errorMessage: msg,
+        });
+
+        return res.status(httpStatus >= 400 && httpStatus < 600 ? httpStatus : 500).json({
+          success: false,
+          provider: 'gemini',
+          modelId: testModel,
+          httpStatus,
+          errorCategory: category,
+          latencyMs,
+          timestamp: new Date().toISOString(),
+          error: msg.replace(/AIza[0-9A-Za-z-_]{20,}/g, '[KEY]'),
+        });
+      }
+    }
+  });
+
+  // 1g. Interactive AI Assistant / Operations Copilot Chat Endpoint
+  app.post('/api/admin/ai-assistant/chat', async (req, res) => {
+    const { message = '', history = [], provider, model } = req.body;
+    const startTime = Date.now();
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ success: false, error: 'User message cannot be empty' });
+    }
+
+    const selectedProvider: 'gemini' | 'deepseek' = provider === 'deepseek' ? 'deepseek' : (provider === 'gemini' ? 'gemini' : activeAISettings.primaryProvider || 'gemini');
+    const fallbackEnabled = activeAISettings.fallbackEnabled !== false;
+
+    const systemPrompt = `You are the authoritative AI Operations Copilot & Content Strategist for TrendPulseXhub.com (TrendPulseX).
+TrendPulseX is a premier gaming codes, rewards, and viral news network.
+Your capabilities:
+1. Researching, verifying, and generating active promo codes for trending games (Roblox Blox Fruits, Fisch, Blade Ball, Anime Vanguards, Anime Defenders, King Legacy, Pet Sim 99, ASTD, Genshin, Free Fire, etc.).
+2. Drafting engaging, high-CTR viral gaming news, patch notes, leak breakdowns, and game guides.
+3. Formulating actionable SEO recommendations, high-ranking meta descriptions, and title templates.
+4. Answering administrative questions about monetization, traffic optimization, and site management.
+
+NON-DESTRUCTIVE SAFEPATH:
+Whenever the user asks you to create a post, draft codes, or publish an article, always write a helpful, professional explanation in markdown and AT THE VERY END include a structured JSON block enclosed in \`\`\`json_action ... \`\`\` with the exact payload:
+\`\`\`json_action
+{
+  "type": "create_post",
+  "title": "Clean, Catchy Headline",
+  "slug": "url-friendly-slug",
+  "game": "Exact Game Name",
+  "category": "Codes",
+  "version": "Update or Leak Tag",
+  "summary": "Brief 1-sentence teaser",
+  "content_text": "<p class=\\"lead\\">Engaging intro...</p><h3>Section Heading</h3><p>Details...</p>",
+  "codes": [
+    { "code": "PROMOCODE2026", "reward": "500 Free Gems + 2x Boost", "status": "Active" }
+  ]
+}
+\`\`\`
+This enables the admin to review the preview card and approve with 1 click.`;
+
+    // Attempt generation with selected provider
+    if (selectedProvider === 'deepseek') {
+      const dsKey = (activeAISettings.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '').trim();
+      const dsModel = model || activeAISettings.deepseekModel || 'deepseek-chat';
+
+      if (!dsKey) {
+        return res.status(400).json({
+          success: false,
+          provider: 'deepseek',
+          modelId: dsModel,
+          errorCategory: 'API_KEY_MISSING',
+          error: 'DeepSeek API Key is missing. Please enter your DEEPSEEK_API_KEY in the AI Service settings.',
+        });
+      }
+
+      try {
+        const formattedMessages = [
+          { role: 'system', content: systemPrompt },
+          ...history.map((h: any) => ({ role: h.role === 'user' ? 'user' : 'assistant', content: String(h.content || '') })),
+          { role: 'user', content: message }
+        ];
+
+        const rawReply = await callDeepSeekChat(formattedMessages, { apiKey: dsKey, model: dsModel, temperature: 0.7 });
+        const latencyMs = Date.now() - startTime;
+
+        let proposedAction: any = null;
+        const actionMatch = rawReply.match(/```json_action\s*([\s\S]*?)\s*```/i);
+        if (actionMatch && actionMatch[1]) {
+          try { proposedAction = JSON.parse(actionMatch[1].trim()); } catch {}
+        }
+        const cleanReply = rawReply.replace(/```json_action[\s\S]*?```/i, '').trim();
+
+        recordAIDiagnostic({
+          provider: 'deepseek',
+          modelId: dsModel,
+          action: 'chat_message',
+          httpStatus: 200,
+          success: true,
+          latencyMs,
+          errorCategory: 'NONE',
+        });
+
+        return res.json({
+          success: true,
+          provider: 'deepseek',
+          model: dsModel,
+          latencyMs,
+          reply: cleanReply || rawReply,
+          proposedAction,
+        });
+      } catch (dsErr: any) {
+        if (fallbackEnabled) {
+          // Fallback to Gemini
+          try {
+            const gemClient = getGeminiClient();
+            if (gemClient) {
+              const fallbackModel = activeAISettings.geminiModel || 'gemini-3.6-flash';
+              const gemResp = await gemClient.models.generateContent({
+                model: fallbackModel,
+                contents: `${systemPrompt}\n\nUser Question:\n${message}`,
+              });
+              const rawReply = gemResp.text || '';
+              const latencyMs = Date.now() - startTime;
+
+              let proposedAction: any = null;
+              const actionMatch = rawReply.match(/```json_action\s*([\s\S]*?)\s*```/i);
+              if (actionMatch && actionMatch[1]) {
+                try { proposedAction = JSON.parse(actionMatch[1].trim()); } catch {}
+              }
+              const cleanReply = rawReply.replace(/```json_action[\s\S]*?```/i, '').trim();
+
+              recordAIDiagnostic({
+                provider: 'gemini',
+                modelId: fallbackModel,
+                action: 'chat_message',
+                httpStatus: 200,
+                success: true,
+                latencyMs,
+                errorCategory: 'NONE',
+                details: 'Failover from DeepSeek to Gemini successful',
+              });
+
+              return res.json({
+                success: true,
+                provider: 'gemini',
+                model: `${fallbackModel} (Failover Fallback)`,
+                latencyMs,
+                reply: cleanReply || rawReply,
+                proposedAction,
+              });
+            }
+          } catch {}
+        }
+
+        const latencyMs = Date.now() - startTime;
+        recordAIDiagnostic({
+          provider: 'deepseek',
+          modelId: dsModel,
+          action: 'chat_message',
+          httpStatus: 500,
+          success: false,
+          latencyMs,
+          errorCategory: 'PROVIDER_UNAVAILABLE',
+          errorMessage: dsErr?.message,
+        });
+
+        return res.status(500).json({
+          success: false,
+          provider: 'deepseek',
+          latencyMs,
+          error: dsErr?.message || 'DeepSeek AI generation failed',
+        });
+      }
+    } else {
+      // Primary: Google Gemini
+      const gemKey = (activeAISettings.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
+      const targetModel = model || activeAISettings.geminiModel || 'gemini-3.6-flash';
+
+      if (!gemKey) {
+        return res.status(400).json({
+          success: false,
+          provider: 'gemini',
+          modelId: targetModel,
+          errorCategory: 'API_KEY_MISSING',
+          error: 'Google Gemini API Key is missing. Please enter your GEMINI_API_KEY in the AI Service settings.',
+        });
+      }
+
+      try {
+        const gemClient = new GoogleGenAI({
+          apiKey: gemKey,
+          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
+        });
+
+        let gemResp;
+        try {
+          gemResp = await gemClient.models.generateContent({
+            model: targetModel,
+            contents: `${systemPrompt}\n\nUser Question:\n${message}`,
+          });
+        } catch (modelErr: any) {
+          // Automatic resilient fallback to gemini-3.6-flash / gemini-3.1-flash-lite
+          try {
+            gemResp = await gemClient.models.generateContent({
+              model: 'gemini-3.6-flash',
+              contents: `${systemPrompt}\n\nUser Question:\n${message}`,
+            });
+          } catch {
+            gemResp = await gemClient.models.generateContent({
+              model: 'gemini-3.1-flash-lite',
+              contents: `${systemPrompt}\n\nUser Question:\n${message}`,
+            });
+          }
+        }
+
+        const rawReply = gemResp.text || '';
+        const latencyMs = Date.now() - startTime;
+
+        let proposedAction: any = null;
+        const actionMatch = rawReply.match(/```json_action\s*([\s\S]*?)\s*```/i);
+        if (actionMatch && actionMatch[1]) {
+          try { proposedAction = JSON.parse(actionMatch[1].trim()); } catch {}
+        }
+        const cleanReply = rawReply.replace(/```json_action[\s\S]*?```/i, '').trim();
+
+        recordAIDiagnostic({
+          provider: 'gemini',
+          modelId: targetModel,
+          action: 'chat_message',
+          httpStatus: 200,
+          success: true,
+          latencyMs,
+          errorCategory: 'NONE',
+        });
+
+        return res.json({
+          success: true,
+          provider: 'gemini',
+          model: targetModel,
+          latencyMs,
+          reply: cleanReply || rawReply,
+          proposedAction,
+        });
+      } catch (gemErr: any) {
+        if (fallbackEnabled) {
+          // Fallback to DeepSeek
+          try {
+            const dsKey = (activeAISettings.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '').trim();
+            if (dsKey) {
+              const formattedMessages = [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message }
+              ];
+              const rawReply = await callDeepSeekChat(formattedMessages, { apiKey: dsKey, model: 'deepseek-chat', temperature: 0.7 });
+              const latencyMs = Date.now() - startTime;
+
+              let proposedAction: any = null;
+              const actionMatch = rawReply.match(/```json_action\s*([\s\S]*?)\s*```/i);
+              if (actionMatch && actionMatch[1]) {
+                try { proposedAction = JSON.parse(actionMatch[1].trim()); } catch {}
+              }
+              const cleanReply = rawReply.replace(/```json_action[\s\S]*?```/i, '').trim();
+
+              recordAIDiagnostic({
+                provider: 'deepseek',
+                modelId: 'deepseek-chat',
+                action: 'chat_message',
+                httpStatus: 200,
+                success: true,
+                latencyMs,
+                errorCategory: 'NONE',
+                details: 'Failover from Gemini to DeepSeek successful',
+              });
+
+              return res.json({
+                success: true,
+                provider: 'deepseek',
+                model: 'deepseek-chat (Failover Fallback)',
+                latencyMs,
+                reply: cleanReply || rawReply,
+                proposedAction,
+              });
+            }
+          } catch {}
+        }
+
+        const latencyMs = Date.now() - startTime;
+        recordAIDiagnostic({
+          provider: 'gemini',
+          modelId: targetModel,
+          action: 'chat_message',
+          httpStatus: 500,
+          success: false,
+          latencyMs,
+          errorCategory: 'PROVIDER_UNAVAILABLE',
+          errorMessage: gemErr?.message,
+        });
+
         return res.status(500).json({
           success: false,
           provider: 'gemini',
           latencyMs,
-          error: err?.message || 'Gemini API connection failed',
+          error: gemErr?.message || 'Gemini AI generation failed',
         });
       }
     }
+  });
+
+  // 1f. Safe Execution of Admin-Approved Actions
+  app.post('/api/admin/ai-assistant/execute-action', async (req, res) => {
+    const { action } = req.body;
+    if (!action || !action.type) {
+      return res.status(400).json({ success: false, error: 'Invalid action payload' });
+    }
+
+    const nowIso = new Date().toISOString();
+
+    if (action.type === 'create_post') {
+      const cleanTitle = String(action.title || 'Untitled Post').trim();
+      const cleanGame = String(action.game || cleanTitle.split(' ')[0] || 'Gaming').trim();
+      const cleanSlug = (action.slug || cleanTitle)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+
+      const imageUrl = getRepresentativeGameImage(cleanGame);
+
+      const postObj = {
+        id: `post_${Date.now()}`,
+        title: cleanTitle,
+        slug: cleanSlug,
+        category: action.category === 'News' ? 'News' : 'Codes',
+        content_type: 'Article',
+        game: cleanGame,
+        image_url: imageUrl,
+        version: action.version || 'Active Drop',
+        ad_direct_link: 'https://example.com/bonus',
+        codes_data: (action.codes || []).map((c: any, idx: number) => ({
+          id: `c_${Date.now()}_${idx}`,
+          game: cleanGame,
+          code: String(c.code || '').trim().toUpperCase(),
+          reward: String(c.reward || 'Free Rewards').trim(),
+          status: c.status === 'Expired' ? 'Expired' : 'Active',
+          updated_at: nowIso,
+        })),
+        content_text: String(action.content_text || `<p>Latest promo codes for ${cleanGame}.</p>`),
+        created_at: nowIso,
+        updated_at: nowIso,
+      };
+
+      // Add to in-memory store
+      inMemoryGeneratedPosts.unshift(postObj);
+
+      // Persist to Supabase if connected
+      if (supabaseServer) {
+        try {
+          const { error } = await supabaseServer.from('posts').upsert(postObj, { onConflict: 'slug' });
+          if (error) {
+            console.warn('[AI Execute Action] Supabase Save Error:', error.message);
+          } else {
+            console.log('[AI Execute Action] Successfully saved AI-approved post to Supabase:', cleanSlug);
+          }
+        } catch (dbErr: any) {
+          console.warn('[AI Execute Action] Supabase Exception:', dbErr?.message);
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: `Post "${cleanTitle}" approved and saved successfully!`,
+        post: postObj,
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Action completed successfully.',
+    });
   });
 
   // 2. Manual Trigger for Automated 12-Hour Background Sync
