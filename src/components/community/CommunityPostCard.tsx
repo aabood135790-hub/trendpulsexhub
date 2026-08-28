@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Heart, MessageSquare, Share2, ZoomIn, Send, Check, Tag, Coins, Gift } from 'lucide-react';
+import { Heart, MessageSquare, Share2, ZoomIn, Send, Check, Tag, Sparkles, User, Shield } from 'lucide-react';
 import { CommunityPost, CommunityComment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -14,11 +14,10 @@ interface CommunityPostCardProps {
 }
 
 export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComment }: CommunityPostCardProps) {
-  const { profile, credits, deductCredits, openWalletModal } = useAuth();
+  const { profile, isAuthenticated, openAuthModal } = useAuth();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [copied, setCopied] = useState(false);
-  const [commentError, setCommentError] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   const formattedTime = (() => {
@@ -33,22 +32,14 @@ export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComme
     e.preventDefault();
     if (!commentText.trim() || isSubmittingComment) return;
 
-    if (credits < 10) {
-      setCommentError(`Insufficient Credits (10 required, balance: ${credits}). Claim free credits at the Reward Box!`);
+    if (!isAuthenticated) {
+      openAuthModal('signin');
       return;
     }
 
     setIsSubmittingComment(true);
-    setCommentError('');
 
     try {
-      const deductRes = await deductCredits(10, 'comment_create', `Comment on post by @${post.username}`);
-      if (!deductRes.success) {
-        setCommentError(deductRes.error || 'Failed to deduct 10 credits.');
-        setIsSubmittingComment(false);
-        return;
-      }
-
       const newComment: CommunityComment = {
         id: `comm_${Date.now()}`,
         post_id: post.id,
@@ -61,9 +52,7 @@ export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComme
 
       onAddComment(post.id, newComment);
       setCommentText('');
-      setIsSubmittingComment(false);
-    } catch (err: any) {
-      setCommentError(err?.message || 'Error publishing comment.');
+    } finally {
       setIsSubmittingComment(false);
     }
   };
@@ -80,12 +69,12 @@ export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComme
   return (
     <article 
       id={post.id} 
-      className="bg-white rounded-3xl border border-indigo-950/10 shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-sapphire-600/30"
+      className="bg-white rounded-3xl border border-[#E5E2EC] shadow-sm overflow-hidden transition-all hover:border-[#C084FC]/70 hover:shadow-md"
     >
       {/* Post Author Header */}
-      <div className="p-4 sm:p-5 flex items-start justify-between gap-3">
+      <div className="p-4 sm:p-5 flex items-start justify-between gap-3 border-b border-[#E5E2EC]">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-azure-200 bg-sapphire-50 shrink-0">
+          <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-purple-200 bg-[#F8F7FA] shrink-0">
             {post.avatar_url ? (
               <img
                 src={post.avatar_url}
@@ -94,7 +83,7 @@ export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComme
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="h-full w-full flex items-center justify-center bg-sapphire-100 text-sapphire-700 font-black text-base">
+              <div className="h-full w-full flex items-center justify-center bg-purple-100 text-[#A855F7] font-black text-base">
                 {post.display_name?.charAt(0) || post.username.charAt(0)}
               </div>
             )}
@@ -102,203 +91,164 @@ export function CommunityPostCard({ post, onImageClick, onLikeToggle, onAddComme
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-black text-sm text-indigo-950 leading-tight">
+              <span className="font-black text-[#090514] text-sm sm:text-base">
                 {post.display_name || post.username}
               </span>
-              <span className="text-xs font-bold text-sapphire-600">
+              <span className="text-xs font-medium text-[#A855F7] font-mono">
                 @{post.username}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-0.5 text-[11px] font-semibold text-indigo-900/50">
+            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500 mt-0.5">
               <span>{formattedTime}</span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1 text-sapphire-700 font-bold bg-azure-100/70 px-2 py-0.5 rounded-md">
-                <Tag size={10} /> {post.game_tag}
-              </span>
+              {post.game_tag && (
+                <>
+                  <span>•</span>
+                  <span className="text-amber-600 font-mono font-bold">{post.game_tag}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Category Pill */}
-        <span className="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider bg-azure-100 text-sapphire-800 border border-sapphire-600/10">
-          {post.category}
-        </span>
+        {/* Category Tag */}
+        {post.category && (
+          <span className="px-3 py-1 rounded-full bg-purple-50 text-[#A855F7] border border-purple-200 text-[11px] font-black uppercase font-mono tracking-wider shrink-0">
+            {post.category}
+          </span>
+        )}
       </div>
 
-      {/* Post Text Body */}
-      <div className="px-4 sm:px-5 pb-3">
-        <p className="text-sm font-medium text-indigo-950 leading-relaxed whitespace-pre-line">
+      {/* Post Content */}
+      <div className="p-4 sm:p-5 space-y-3">
+        {post.title && (
+          <h3 className="text-base sm:text-lg font-black text-[#090514] leading-snug">
+            {post.title}
+          </h3>
+        )}
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-line">
           {post.content}
         </p>
-      </div>
 
-      {/* Post Photo (PHOTO ONLY - Click for Lightbox) */}
-      {post.image_url && (
-        <div className="px-4 sm:px-5 pb-4">
-          <div
-            onClick={() => onImageClick(post.image_url!, `${post.display_name}'s Photo`)}
-            className="relative group rounded-2xl overflow-hidden cursor-zoom-in border border-indigo-950/10 bg-slate-900 max-h-[420px] flex items-center justify-center"
-          >
+        {/* Attached Image */}
+        {post.image_url && (
+          <div className="relative rounded-2xl overflow-hidden mt-3 border border-[#E5E2EC] bg-slate-50 group max-h-96">
             <img
               src={post.image_url}
-              alt="Community Upload"
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              alt={post.title || 'Community Attachment'}
+              className="w-full h-auto object-cover max-h-96 cursor-pointer group-hover:scale-101 transition-transform"
+              onClick={() => onImageClick(post.image_url!, post.title)}
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
-              <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                <ZoomIn size={14} className="text-sky-300" /> Click to enlarge
-              </span>
-              <span className="text-[11px] font-semibold text-white/80 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm">
-                PHOTO
-              </span>
-            </div>
+            <button
+              onClick={() => onImageClick(post.image_url!, post.title)}
+              className="absolute top-3 right-3 p-2 rounded-xl bg-[#090514]/80 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md border border-purple-400/40"
+              title="Expand Image"
+            >
+              <ZoomIn size={16} />
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Post Action Footer (Like, Comments, Share) */}
-      <div className="px-4 sm:px-5 py-3 border-t border-indigo-950/10 bg-azure-50/30 flex items-center justify-between">
-        <div className="flex items-center gap-4 sm:gap-6">
+      {/* Interaction Bar */}
+      <div className="px-4 sm:px-5 py-3 border-t border-[#E5E2EC] bg-[#F8F7FA] flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
+          
           {/* Like Button */}
           <button
+            type="button"
             onClick={() => onLikeToggle(post.id)}
-            className={`flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               post.is_liked
-                ? 'text-red-500 hover:text-red-600'
-                : 'text-indigo-900/60 hover:text-indigo-950'
+                ? 'bg-rose-50 text-rose-600 border border-rose-200 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
             }`}
           >
-            <Heart
-              size={18}
-              className={`transition-transform active:scale-125 ${
-                post.is_liked ? 'fill-red-500 text-red-500' : ''
-              }`}
-            />
+            <Heart size={15} className={post.is_liked ? 'fill-rose-500 text-rose-500' : ''} />
             <span>{post.likes_count}</span>
           </button>
 
-          {/* Comments Toggle Button */}
+          {/* Comments Button */}
           <button
+            type="button"
             onClick={() => setShowComments(!showComments)}
-            className="flex items-center gap-1.5 text-xs font-bold text-indigo-900/60 hover:text-sapphire-600 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all cursor-pointer"
           >
-            <MessageSquare size={17} />
-            <span>{post.comments?.length || post.comments_count || 0}</span>
+            <MessageSquare size={15} />
+            <span>{post.comments_count || post.comments?.length || 0}</span>
           </button>
         </div>
 
         {/* Share Button */}
         <button
+          type="button"
           onClick={handleShare}
-          className="flex items-center gap-1.5 text-xs font-bold text-indigo-900/60 hover:text-sapphire-600 transition-colors cursor-pointer"
-          title="Copy link to post"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-[#A855F7] hover:bg-slate-200/60 transition-all cursor-pointer"
         >
-          {copied ? (
-            <>
-              <Check size={16} className="text-emerald-600" />
-              <span className="text-emerald-600">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Share2 size={16} />
-              <span>Share</span>
-            </>
-          )}
+          {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
+          <span>{copied ? 'Copied' : 'Share'}</span>
         </button>
       </div>
 
-      {/* Collapsible Comments Section */}
+      {/* Comments Section */}
       <AnimatePresence>
         {showComments && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="border-t border-indigo-950/10 bg-azure-50/50 p-4 sm:p-5 space-y-4"
+            className="border-t border-[#E5E2EC] bg-[#F8F7FA] p-4 sm:p-5 space-y-4"
           >
-            {/* Existing Comments List */}
-            <div className="space-y-3">
-              {(post.comments || []).length > 0 ? (
-                post.comments?.map((comment) => (
-                  <div key={comment.id} className="flex items-start gap-2.5 bg-white p-3 rounded-2xl border border-indigo-950/10 shadow-2xs">
-                    <div className="h-7 w-7 rounded-full overflow-hidden bg-sapphire-100 text-sapphire-700 shrink-0 font-bold text-xs flex items-center justify-center">
+            {/* New Comment Input */}
+            <form onSubmit={handleCommentSubmit} className="flex gap-2">
+              <input
+                type="text"
+                placeholder={isAuthenticated ? "Write a reply..." : "Sign in to reply..."}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                className="flex-1 bg-white border border-[#E5E2EC] rounded-xl px-3.5 py-2 text-xs text-[#090514] placeholder:text-slate-400 focus:outline-none focus:border-[#A855F7]"
+              />
+              <button
+                type="submit"
+                disabled={!commentText.trim() || isSubmittingComment}
+                className="px-4 py-2 bg-[#A855F7] hover:bg-[#9333EA] disabled:opacity-40 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <Send size={13} />
+                <span>Send</span>
+              </button>
+            </form>
+
+            {/* Comments List */}
+            {post.comments && post.comments.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                {post.comments.map((comment) => (
+                  <div key={comment.id} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-[#E5E2EC] shadow-xs">
+                    <div className="h-7 w-7 rounded-full overflow-hidden bg-purple-100 text-[#A855F7] flex items-center justify-center font-bold text-xs shrink-0">
                       {comment.avatar_url ? (
                         <img src={comment.avatar_url} alt={comment.username} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
-                        comment.username.charAt(0).toUpperCase()
+                        comment.username.charAt(0)
                       )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-indigo-950">@{comment.username}</span>
-                        <span className="text-[10px] text-indigo-900/40 font-medium">Just now</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-[#090514] leading-tight">@{comment.username}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        </span>
                       </div>
-                      <p className="text-xs text-indigo-900/80 font-medium mt-0.5 leading-relaxed">
+                      <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                         {comment.content}
                       </p>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-xs text-indigo-900/50 font-medium italic text-center py-2">
-                  No comments yet. Be the first to reply!
-                </p>
-              )}
-            </div>
-
-            {/* Comment Error & Claim Prompt */}
-            {commentError && (
-              <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-xs font-bold text-amber-950 flex items-center justify-between gap-2">
-                <span>{commentError}</span>
-                <button
-                  type="button"
-                  onClick={openWalletModal}
-                  className="px-2.5 py-1 rounded-lg bg-sapphire-600 hover:bg-sapphire-500 text-white text-[11px] font-black shrink-0 cursor-pointer flex items-center gap-1"
-                >
-                  <Gift size={11} />
-                  <span>Claim +100</span>
-                </button>
+                ))}
               </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic text-center py-2">
+                No replies yet. Be the first to start the discussion!
+              </p>
             )}
-
-            {/* Add Comment Input Form */}
-            <form onSubmit={handleCommentSubmit} className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full overflow-hidden bg-sapphire-50 shrink-0 border border-indigo-950/10">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center font-bold text-xs text-sapphire-700">
-                      {profile?.username?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                </div>
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder={`Reply as @${profile?.username || 'gamer'}...`}
-                  className="flex-1 px-3.5 py-2 bg-white border border-indigo-950/15 rounded-xl text-xs font-medium text-indigo-950 focus:border-sapphire-600 focus:ring-1 focus:ring-sapphire-600"
-                />
-                <button
-                  type="submit"
-                  disabled={!commentText.trim() || isSubmittingComment}
-                  className="px-3.5 py-2 rounded-xl bg-sapphire-600 hover:bg-sapphire-500 text-white shadow-xs disabled:opacity-40 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold"
-                  title="Send comment (10 Credits)"
-                >
-                  <Send size={13} />
-                  <span className="hidden xs:inline">10 Cr</span>
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between px-1 text-[10px] font-semibold text-indigo-900/50">
-                <span className="flex items-center gap-1">
-                  <Coins size={10} className="stroke-[2.5]" /> Cost: 10 Credits
-                </span>
-                <span>Your Wallet: {credits} Credits</span>
-              </div>
-            </form>
           </motion.div>
         )}
       </AnimatePresence>

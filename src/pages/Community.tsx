@@ -8,18 +8,16 @@ import { CreatePostModal } from '../components/community/CreatePostModal';
 import { ImageLightbox } from '../components/community/ImageLightbox';
 import { UniversalAdSlot } from '../components/ads/UniversalAdSlot';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'motion/react';
+import { usePageSEO } from '../lib/seo';
 
-const CATEGORIES: CommunityCategory[] = ['All', 'Trending', 'Code Drops', 'Discussions', 'Screenshots', 'Guides'];
+const CATEGORIES: CommunityCategory[] = ['All', 'Trending', 'Discussions', 'Guides', 'Screenshots'];
 
-const GAME_FILTERS = [
+const RACE_FILTERS = [
   'All',
-  'Blox Fruits',
-  'Genshin Impact',
-  'King Legacy',
-  'Anime Defenders',
-  'Honkai: Star Rail',
-  'Monopoly GO',
+  'Dragonkin',
+  'Starborne',
+  'Shadowveil',
+  'Frostborn',
 ];
 
 export function Community() {
@@ -28,10 +26,16 @@ export function Community() {
   const [posts, setPosts] = useState<CommunityPost[]>(mockCommunityPosts);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<CommunityCategory>('All');
-  const [selectedGame, setSelectedGame] = useState<string>('All');
+  const [selectedRace, setSelectedRace] = useState<string>('All');
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt?: string } | null>(null);
+
+  usePageSEO({
+    title: 'TrendPulseX | Player Community - Guides, Builds & Clan Discussions',
+    description: 'Join the TrendPulseX player community. Share 2D gameplay strategies, elemental race builds, clan recruitment, and screenshots.',
+    keywords: 'trendpulsex community, gamer feed, dragonkin builds, starborne guides, multiplayer community',
+  });
 
   // Load feed from Supabase / local cache
   const loadPosts = async () => {
@@ -39,13 +43,16 @@ export function Community() {
     try {
       const data = await getLiveCommunityPosts(
         selectedCategory === 'All' ? undefined : selectedCategory,
-        selectedGame === 'All' ? undefined : selectedGame
+        selectedRace === 'All' ? undefined : selectedRace
       );
       if (data && data.length > 0) {
         setPosts(data);
+      } else {
+        setPosts(mockCommunityPosts);
       }
     } catch (err) {
       console.warn('Could not fetch community posts:', err);
+      setPosts(mockCommunityPosts);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +60,7 @@ export function Community() {
 
   useEffect(() => {
     loadPosts();
-  }, [selectedCategory, selectedGame]);
+  }, [selectedCategory, selectedRace]);
 
   // Handle Like Toggle
   const handleLikeToggle = async (postId: string) => {
@@ -136,63 +143,65 @@ export function Community() {
   const filteredPosts = posts.filter(post => {
     const matchesCategory =
       selectedCategory === 'All' ||
-      (selectedCategory === 'Trending' ? post.likes_count >= 40 : post.category === selectedCategory);
+      (selectedCategory === 'Trending' ? post.likes_count >= 30 : post.category === selectedCategory);
     
-    const matchesGame =
-      selectedGame === 'All' || post.game_tag.toLowerCase().includes(selectedGame.toLowerCase());
+    const matchesRace =
+      selectedRace === 'All' || post.game_tag.toLowerCase().includes(selectedRace.toLowerCase());
 
-    return matchesCategory && matchesGame;
+    return matchesCategory && matchesRace;
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
-      {/* Top Banner / Hero */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-sapphire-900 via-indigo-950 to-sapphire-950 p-6 sm:p-8 text-white shadow-xl mb-8 border border-sapphire-500/20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12 text-[#090514]">
+      
+      {/* Top Banner / Hero (Deep Dark Purple Focal Element) */}
+      <div className="relative rounded-3xl overflow-hidden bg-[#090514] p-6 sm:p-8 text-white shadow-2xl mb-8 border border-[#160B2E]">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sapphire-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold">
-              <Users size={13} /> The TrendPulseXhub Community
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#160B2E] border border-[#A855F7]/40 text-[#C084FC] text-xs font-bold font-mono uppercase tracking-wider">
+              <Users size={13} className="text-[#C084FC]" /> TrendPulseX Community
             </div>
             <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
-              Gamer Hub & Code Drops
+              Player Community & Chronicles
             </h1>
-            <p className="text-sm font-medium text-azure-100/80 leading-relaxed">
-              Connect with fellow players, share freshly verified redemption codes, showcase your lucky gacha pulls, and post in-game screenshots with photo attachments.
+            <p className="text-xs sm:text-sm font-medium text-slate-300 leading-relaxed">
+              Connect with fellow players, share race builds, discover wilderness secrets, recruit for your clan, and post in-game screenshots.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-sapphire-600 to-sky-500 hover:from-sapphire-500 hover:to-sky-400 text-white px-5 py-3 rounded-2xl font-black shadow-lg shadow-sapphire-600/30 transition-all active:scale-95 cursor-pointer text-sm"
+              className="flex items-center gap-2 bg-[#A855F7] hover:bg-[#9333EA] text-white px-5 py-3 rounded-2xl font-black shadow-lg shadow-[#A855F7]/30 transition-all active:scale-95 cursor-pointer text-sm border border-[#C084FC]/30"
             >
               <Plus size={18} strokeWidth={3} /> Create Post
             </button>
             <button
               onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-2xl font-bold transition-all text-sm cursor-pointer"
+              className="flex items-center gap-2 bg-[#160B2E] hover:bg-[#1F0F3D] text-[#C084FC] hover:text-white border border-[#A855F7]/30 px-4 py-3 rounded-2xl font-bold transition-all text-sm cursor-pointer"
             >
-              <ShieldCheck size={16} className="text-sky-300" /> Edit Profile
+              <ShieldCheck size={16} className="text-[#FBBF24]" /> Edit Profile
             </button>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
         {/* Main Feed Column (3 cols on large screen) */}
         <div className="lg:col-span-3 space-y-6">
           
           {/* Quick Create Post Box */}
-          <div className="bg-white p-4 sm:p-5 rounded-3xl border border-indigo-950/10 shadow-sm flex items-center gap-3 sm:gap-4">
+          <div className="bg-white p-4 sm:p-5 rounded-3xl border border-[#E5E2EC] shadow-sm flex items-center gap-3 sm:gap-4">
             <div 
               onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
-              className="h-11 w-11 rounded-full overflow-hidden border-2 border-azure-200 bg-sapphire-50 shrink-0 cursor-pointer hover:border-sapphire-600 transition-colors"
+              className="h-11 w-11 rounded-full overflow-hidden border-2 border-purple-200 bg-[#F8F7FA] shrink-0 cursor-pointer hover:border-[#A855F7] transition-colors"
               title="Click to edit profile"
             >
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
               ) : (
-                <div className="h-full w-full flex items-center justify-center font-bold text-sapphire-700">
+                <div className="h-full w-full flex items-center justify-center font-bold text-[#A855F7] bg-purple-100">
                   {profile?.display_name?.charAt(0) || 'G'}
                 </div>
               )}
@@ -200,10 +209,10 @@ export function Community() {
 
             <div
               onClick={() => setIsCreateOpen(true)}
-              className="flex-1 bg-azure-50/70 hover:bg-azure-100/60 border border-indigo-950/10 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-indigo-900/60 cursor-pointer transition-colors flex items-center justify-between"
+              className="flex-1 bg-[#F8F7FA] hover:bg-[#F1EFF5] border border-[#E5E2EC] rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-slate-500 cursor-pointer transition-colors flex items-center justify-between"
             >
-              <span>Share a new code, boss drop, or screenshot...</span>
-              <div className="flex items-center gap-2 text-sapphire-600 font-bold text-xs">
+              <span>Share strategy, recruit clan members, or screenshot...</span>
+              <div className="flex items-center gap-2 text-[#A855F7] font-bold text-xs">
                 <ImageIcon size={16} />
                 <span className="hidden sm:inline">Photo</span>
               </div>
@@ -211,7 +220,7 @@ export function Community() {
 
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="h-10 px-4 rounded-2xl bg-sapphire-600 hover:bg-sapphire-500 text-white font-black text-xs shadow-md shadow-sapphire-600/20 transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+              className="h-10 px-4 rounded-2xl bg-[#A855F7] hover:bg-[#9333EA] text-white font-black text-xs shadow-md shadow-[#A855F7]/25 transition-all cursor-pointer shrink-0 flex items-center gap-1.5 border border-[#C084FC]/30"
             >
               <Plus size={16} />
               <span className="hidden sm:inline">Post</span>
@@ -228,35 +237,34 @@ export function Community() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
                     active
-                      ? 'bg-sapphire-600 text-white shadow-md shadow-sapphire-600/25'
-                      : 'bg-white hover:bg-azure-50 text-indigo-900/70 border border-indigo-950/10'
+                      ? 'bg-[#A855F7] text-white shadow-md shadow-[#A855F7]/30 border border-[#C084FC]/40'
+                      : 'bg-white hover:bg-[#F1EFF5] text-slate-600 border border-[#E5E2EC]'
                   }`}
                 >
-                  {cat === 'Trending' && <Flame size={12} className="inline mr-1 text-sky-300" />}
-                  {cat === 'Code Drops' && <Sparkles size={12} className="inline mr-1 text-sky-400" />}
+                  {cat === 'Trending' && <Flame size={12} className="inline mr-1 text-[#FBBF24]" />}
                   {cat}
                 </button>
               );
             })}
           </div>
 
-          {/* Game Tag Filter Chips */}
+          {/* Race Filter Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
-            <span className="text-indigo-900/50 font-bold flex items-center gap-1 shrink-0">
-              <Filter size={12} /> Game:
+            <span className="text-slate-600 font-bold flex items-center gap-1 shrink-0 font-mono">
+              <Filter size={12} className="text-[#A855F7]" /> Race / Tag:
             </span>
             <div className="flex items-center gap-1.5">
-              {GAME_FILTERS.map((game) => (
+              {RACE_FILTERS.map((race) => (
                 <button
-                  key={game}
-                  onClick={() => setSelectedGame(game)}
+                  key={race}
+                  onClick={() => setSelectedRace(race)}
                   className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    selectedGame === game
-                      ? 'bg-indigo-950 text-white shadow-xs'
-                      : 'bg-azure-50/80 hover:bg-azure-100 text-indigo-900/70 border border-indigo-950/10'
+                    selectedRace === race
+                      ? 'bg-purple-100 text-purple-800 border border-purple-300 shadow-xs'
+                      : 'bg-white hover:bg-[#F1EFF5] text-slate-600 border border-[#E5E2EC]'
                   }`}
                 >
-                  {game}
+                  {race}
                 </button>
               ))}
             </div>
@@ -267,38 +275,33 @@ export function Community() {
             {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="animate-pulse bg-white rounded-3xl h-64 border border-indigo-950/10" />
+                  <div key={i} className="animate-pulse bg-white rounded-3xl h-56 border border-[#E5E2EC]" />
                 ))}
               </div>
             ) : filteredPosts.length > 0 ? (
-              filteredPosts.map((post, idx) => (
-                <div key={post.id} className="space-y-5">
-                  <CommunityPostCard
-                    post={post}
-                    onImageClick={(url, alt) => setLightboxImage({ url, alt })}
-                    onLikeToggle={handleLikeToggle}
-                    onAddComment={handleAddComment}
-                  />
-                  {/* Insert in-feed ad after 2nd post */}
-                  {idx === 1 && (
-                    <UniversalAdSlot slotId="in_article_mid" />
-                  )}
-                </div>
+              filteredPosts.map((post) => (
+                <CommunityPostCard
+                  key={post.id}
+                  post={post}
+                  onImageClick={(url, alt) => setLightboxImage({ url, alt })}
+                  onLikeToggle={handleLikeToggle}
+                  onAddComment={handleAddComment}
+                />
               ))
             ) : (
-              <div className="bg-white rounded-3xl border border-indigo-950/10 p-12 text-center space-y-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-azure-100 text-sapphire-600 mx-auto">
+              <div className="bg-white rounded-3xl border border-[#E5E2EC] p-12 text-center space-y-4 shadow-sm">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-[#A855F7] mx-auto border border-purple-200">
                   <MessageSquare size={26} />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-indigo-950">No community posts found</h3>
-                  <p className="text-xs font-semibold text-indigo-900/50 mt-1">
-                    Be the first player to create a post in this category!
+                  <h3 className="text-base font-black text-[#090514]">No community posts found</h3>
+                  <p className="text-xs font-semibold text-slate-500 mt-1">
+                    Be the first player to start a discussion or guide in this topic!
                   </p>
                 </div>
                 <button
                   onClick={() => setIsCreateOpen(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sapphire-600 text-white font-bold text-xs shadow-md"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold text-xs shadow-md"
                 >
                   <Plus size={16} /> Create First Post
                 </button>
@@ -309,17 +312,15 @@ export function Community() {
 
         {/* Sidebar Column (Desktop) */}
         <div className="hidden lg:block space-y-6">
-          {/* Universal Sidebar Ad Slot */}
-          <UniversalAdSlot slotId="sidebar_community" />
-
+          
           {/* User Profile Card */}
-          <div className="bg-white p-6 rounded-3xl border border-indigo-950/10 shadow-sm text-center space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E2EC] shadow-sm text-center space-y-4">
             <div className="relative inline-block">
-              <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-sapphire-600 shadow-md mx-auto bg-azure-50">
+              <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-purple-300 shadow-sm mx-auto bg-purple-50">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center font-bold text-2xl text-sapphire-700">
+                  <div className="h-full w-full flex items-center justify-center font-bold text-2xl text-[#A855F7]">
                     {profile?.display_name?.charAt(0) || 'G'}
                   </div>
                 )}
@@ -327,53 +328,52 @@ export function Community() {
             </div>
 
             <div>
-              <h3 className="text-base font-black text-indigo-950 leading-tight">
-                {profile?.display_name || 'TrendPulse Gamer'}
+              <h3 className="text-base font-black text-[#090514] leading-tight">
+                {profile?.display_name || 'TrendPulse Player'}
               </h3>
-              <p className="text-xs font-bold text-sapphire-600 mt-0.5">
-                @{profile?.username || 'gamer'}
+              <p className="text-xs font-bold text-[#A855F7] mt-0.5 font-mono">
+                @{profile?.username || 'player'}
               </p>
               {profile?.favorite_game && (
-                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 mt-2 rounded-full bg-azure-100 text-sapphire-800 text-[10px] font-black">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 mt-2 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black font-mono">
                   <Tag size={10} /> {profile.favorite_game}
                 </div>
               )}
             </div>
 
             {profile?.bio && (
-              <p className="text-xs text-indigo-900/70 font-medium leading-relaxed italic">
+              <p className="text-xs text-slate-600 font-medium leading-relaxed italic">
                 "{profile.bio}"
               </p>
             )}
 
             <button
               onClick={() => isAuthenticated ? openEditProfile() : openAuthModal('signin')}
-              className="w-full py-2.5 rounded-xl bg-azure-50 hover:bg-azure-100 text-sapphire-700 font-bold text-xs border border-indigo-950/10 transition-colors"
+              className="w-full py-2.5 rounded-xl bg-[#F8F7FA] hover:bg-[#F1EFF5] text-[#090514] font-bold text-xs border border-[#E5E2EC] transition-colors cursor-pointer"
             >
-              Edit Gamer Profile
+              {isAuthenticated ? 'Edit Player Profile' : 'Sign In with Google'}
             </button>
           </div>
 
-          {/* Code Drops Leaderboard */}
-          <div className="bg-white p-6 rounded-3xl border border-indigo-950/10 shadow-sm space-y-4">
+          {/* Top Active Champions Leaderboard */}
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E2EC] shadow-sm space-y-4">
             <div className="flex items-center gap-2">
-              <Trophy size={18} className="text-sky-500" />
-              <h3 className="text-sm font-black text-indigo-950">Top Code Hunters</h3>
+              <Trophy size={18} className="text-[#FBBF24]" />
+              <h3 className="text-sm font-black text-[#090514]">Top Active Champions</h3>
             </div>
 
             <div className="space-y-3">
               {[
-                { name: 'BloxMaster', drops: '48 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ec4899"><path d="M19.08 4.93l-1.41-1.42c-.39-.39-1.02-.39-1.41 0L4.93 14.85c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l11.33-11.33c.39-.39.39-1.03 0-1.41zM6.34 14.85l1.41-1.41 1.41 1.41-1.41 1.41-1.41-1.41z"/></svg>' },
-                { name: 'Vortex_Gamer99', drops: '31 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a855f7"><path d="M21.58 16.09l-1.09-7.66C20.18 6.27 18.4 5 16.32 5H7.68C5.6 5 3.82 6.27 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>' },
-                { name: 'GenshinMaster', drops: '24 verified codes', avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230ea5e9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z"/></svg>' },
-              ].map((hunter, index) => (
-                <div key={hunter.name} className="flex items-center justify-between gap-3 text-xs">
+                { name: 'IgnisPrime', race: 'Dragonkin • Rank 8', rank: '1' },
+                { name: 'Astraea', race: 'Starborne • Rank 7', rank: '2' },
+                { name: 'VanguardGlacier', race: 'Frostborn • Rank 6', rank: '3' },
+              ].map((champion) => (
+                <div key={champion.name} className="flex items-center justify-between gap-3 text-xs p-2 rounded-xl bg-[#F8F7FA] border border-[#E5E2EC]">
                   <div className="flex items-center gap-2.5">
-                    <span className="font-black text-indigo-900/40 w-4">{index + 1}</span>
-                    <img src={hunter.avatar} alt={hunter.name} className="h-8 w-8 rounded-full object-cover border border-azure-200" referrerPolicy="no-referrer" />
+                    <span className="font-mono font-black text-[#FBBF24] w-4">{champion.rank}</span>
                     <div>
-                      <span className="font-bold text-indigo-950 block leading-tight">{hunter.name}</span>
-                      <span className="text-[10px] text-sapphire-600 font-semibold">{hunter.drops}</span>
+                      <span className="font-bold text-[#090514] block leading-tight">{champion.name}</span>
+                      <span className="text-[10px] text-[#A855F7] font-mono">{champion.race}</span>
                     </div>
                   </div>
                 </div>
@@ -381,25 +381,24 @@ export function Community() {
             </div>
           </div>
 
-          {/* Community Guidelines Card */}
-          <div className="bg-azure-50/80 p-5 rounded-3xl border border-indigo-950/10 space-y-2 text-xs">
-            <h4 className="font-black text-indigo-950 uppercase tracking-wider text-[11px]">Photo Upload Rules</h4>
-            <p className="text-indigo-900/60 leading-relaxed">
-              Attach in-game screenshots and reward claim screens (PNG, JPG, WebP up to 10MB). Video uploads are disabled for fast mobile loading.
+          {/* Community Rules Card */}
+          <div className="bg-white p-5 rounded-3xl border border-[#E5E2EC] shadow-sm space-y-2 text-xs">
+            <h4 className="font-black text-[#A855F7] uppercase tracking-wider text-[11px] font-mono">English Interface</h4>
+            <p className="text-slate-600 leading-relaxed">
+              TrendPulseX interface is English-only. Keep discussions respectful and share constructive 2D multiplayer strategies.
             </p>
           </div>
         </div>
       </div>
 
       {/* Floating Create Post Button for Mobile */}
-      <motion.button
-        whileTap={{ scale: 0.9 }}
+      <button
         onClick={() => setIsCreateOpen(true)}
-        className="md:hidden fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-sapphire-600 text-white shadow-xl shadow-sapphire-600/40 border border-sky-400/40 cursor-pointer"
+        className="md:hidden fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-purple-600 text-white shadow-xl shadow-purple-600/40 border border-purple-300/40 cursor-pointer active:scale-95 transition-transform"
         aria-label="Create Post"
       >
         <Plus size={28} strokeWidth={2.5} />
-      </motion.button>
+      </button>
 
       {/* Create Post Modal */}
       <CreatePostModal

@@ -202,20 +202,20 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-indigo-950/10 overflow-hidden z-10 my-4"
+          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E5E2EC] overflow-hidden z-10 my-4"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-950/10 bg-azure-50/60">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2EC] bg-[#F8F7FA]">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sapphire-600 text-white shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#A855F7] text-white shadow-sm">
                 <Sparkles size={18} />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-black text-indigo-950">Create Community Post</h2>
-                <div className="flex items-center gap-2 text-xs font-semibold text-indigo-900/60">
+                <h2 className="text-base sm:text-lg font-black text-[#090514]">Create Community Post</h2>
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
                   <span>Photo Only uploads</span>
                   <span>•</span>
-                  <span className="inline-flex items-center gap-1 font-mono text-sapphire-700 font-bold">
+                  <span className="inline-flex items-center gap-1 font-mono text-[#A855F7] font-bold">
                     <Coins size={11} className="stroke-[3]" /> Balance: {credits}
                   </span>
                 </div>
@@ -223,7 +223,7 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-indigo-900/60 hover:text-indigo-950 hover:bg-white transition-colors"
+              className="p-2 rounded-xl text-slate-500 hover:text-[#090514] hover:bg-white transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -240,9 +240,9 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
 
             {/* Insufficient Credits Warning & Refill Action */}
             {!hasSufficientCredits && (
-              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-indigo-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-xl bg-amber-400 text-indigo-950 flex items-center justify-center shrink-0">
+                  <div className="h-8 w-8 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center shrink-0">
                     <Coins size={16} className="stroke-[3]" />
                   </div>
                   <div>
@@ -255,7 +255,7 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
                   onClick={() => {
                     openWalletModal();
                   }}
-                  className="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-black shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs font-black shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Gift size={13} />
                   <span>Claim +100</span>
@@ -266,20 +266,20 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
             {/* User Info Preview & Cost Badge */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full overflow-hidden border border-indigo-950/15 bg-sapphire-50 shrink-0">
+                <div className="h-10 w-10 rounded-full overflow-hidden border border-purple-200 bg-purple-50 shrink-0">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
-                    <div className="h-full w-full flex items-center justify-center font-bold text-sapphire-700">
+                    <div className="h-full w-full flex items-center justify-center font-bold text-[#A855F7]">
                       {profile?.display_name?.charAt(0) || 'G'}
                     </div>
                   )}
                 </div>
                 <div>
-                  <span className="text-sm font-black text-indigo-950 block leading-tight">
+                  <span className="text-sm font-black text-[#090514] block leading-tight">
                     {profile?.display_name || 'TrendPulse Gamer'}
                   </span>
-                  <span className="text-xs font-bold text-sapphire-600">
+                  <span className="text-xs font-bold text-[#A855F7] font-mono">
                     @{profile?.username || 'gamer'}
                   </span>
                 </div>
@@ -287,11 +287,11 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
 
               {/* Cost Indicator Badge */}
               <div className="flex flex-col items-end">
-                <span className="text-[10px] font-bold text-indigo-900/50 uppercase tracking-wider">Post Cost</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Post Cost</span>
                 <span className={`inline-flex items-center gap-1 font-mono text-xs font-black px-2.5 py-1 rounded-lg border ${
                   (selectedFile || imagePreview) 
-                    ? 'bg-sky-50 text-sky-800 border-sky-200' 
-                    : 'bg-azure-100 text-sapphire-800 border-sapphire-200'
+                    ? 'bg-purple-50 text-purple-800 border-purple-200' 
+                    : 'bg-slate-50 text-slate-800 border-slate-200'
                 }`}>
                   <Coins size={12} className="stroke-[3]" />
                   {requiredCredits} Credits {(selectedFile || imagePreview) ? '(Photo)' : '(Text)'}
@@ -302,13 +302,13 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
             {/* Game & Category Selector */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
-                <label className="block text-[11px] font-black text-indigo-900/70 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Tag size={12} className="text-sapphire-600" /> Game Tag
+                <label className="block text-[11px] font-black text-slate-600 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Tag size={12} className="text-[#A855F7]" /> Race / Realm
                 </label>
                 <select
                   value={gameTag}
                   onChange={(e) => setGameTag(e.target.value)}
-                  className="w-full px-3 py-2 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-xs text-indigo-950 focus:border-sapphire-600"
+                  className="w-full px-3 py-2 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-bold text-xs text-[#090514] focus:border-[#A855F7] focus:outline-none"
                 >
                   {GAME_TAGS.map((tag) => (
                     <option key={tag} value={tag}>{tag}</option>
@@ -317,13 +317,13 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
               </div>
 
               <div>
-                <label className="block text-[11px] font-black text-indigo-900/70 uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-black text-slate-600 uppercase tracking-wider mb-1">
                   Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as CommunityCategory)}
-                  className="w-full px-3 py-2 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-xs text-indigo-950 focus:border-sapphire-600"
+                  className="w-full px-3 py-2 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-bold text-xs text-[#090514] focus:border-[#A855F7] focus:outline-none"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -338,8 +338,8 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}
-                placeholder="What's happening in your game? Share a new code, boss victory, or drop a question..."
-                className="w-full p-4 bg-azure-50/60 border border-indigo-950/15 rounded-2xl font-medium text-sm text-indigo-950 focus:border-sapphire-600 focus:bg-white focus:ring-2 focus:ring-sapphire-600/20 resize-none leading-relaxed"
+                placeholder="What's happening in the realm? Share a build, wilderness discovery, or recruit for your clan..."
+                className="w-full p-4 bg-[#F8F7FA] border border-[#E5E2EC] rounded-2xl font-medium text-sm text-[#090514] focus:border-[#A855F7] focus:bg-white focus:outline-none resize-none leading-relaxed"
                 required
               />
             </div>
@@ -347,7 +347,7 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
             {/* Photo Attachment (PHOTO ONLY) */}
             <div>
               {imagePreview ? (
-                <div className="relative rounded-2xl overflow-hidden border border-indigo-950/15 group bg-black/5">
+                <div className="relative rounded-2xl overflow-hidden border border-[#E5E2EC] group bg-black/5">
                   <img
                     src={imagePreview}
                     alt="Preview"
@@ -371,14 +371,14 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-indigo-950/15 hover:border-sapphire-600 bg-azure-50/40 hover:bg-azure-50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group"
+                  className="border-2 border-dashed border-[#E5E2EC] hover:border-[#A855F7] bg-[#F8F7FA] hover:bg-[#F1EFF5] p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm text-sapphire-600 group-hover:scale-105 transition-transform">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm text-[#A855F7] group-hover:scale-105 transition-transform">
                     <ImageIcon size={20} />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs font-black text-indigo-950">Add Photo from Gallery</p>
-                    <p className="text-[11px] text-indigo-900/50 font-medium">JPEG, PNG, WebP or GIF (Photos Only)</p>
+                    <p className="text-xs font-black text-[#090514]">Add Photo from Gallery</p>
+                    <p className="text-[11px] text-slate-500 font-medium">JPEG, PNG, WebP or GIF (Photos Only)</p>
                   </div>
                 </div>
               )}
@@ -393,11 +393,11 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
             </div>
 
             {/* Submit Bar */}
-            <div className="flex items-center justify-between pt-3 border-t border-indigo-950/10">
+            <div className="flex items-center justify-between pt-3 border-t border-[#E5E2EC]">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-sapphire-700 hover:bg-azure-100 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#A855F7] hover:bg-purple-50 transition-colors cursor-pointer"
               >
                 <ImageIcon size={16} />
                 <span>{imagePreview ? 'Change Photo' : 'Attach Photo'}</span>
@@ -408,14 +408,14 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
                   type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="px-4 py-2 rounded-xl border border-indigo-950/15 text-indigo-950 text-xs font-bold hover:bg-azure-50"
+                  className="px-4 py-2 rounded-xl border border-[#E5E2EC] text-[#090514] text-xs font-bold hover:bg-[#F8F7FA] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-black shadow-md shadow-sapphire-600/25 transition-all disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs font-black shadow-md shadow-[#A855F7]/25 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>

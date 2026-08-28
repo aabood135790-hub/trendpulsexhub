@@ -11,37 +11,43 @@ import { trackPageView } from '../../lib/analytics';
 
 export function AppLayout() {
   const location = useLocation();
+  const isGameplay = location.pathname.startsWith('/game/play');
 
   useEffect(() => {
     trackPageView(location.pathname + location.search, document.title);
   }, [location.pathname, location.search]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-azure-50/20">
-      {/* Adsterra Global Popunder & Social Bar Engine */}
+    <div className="flex min-h-screen flex-col bg-[#F8F7FA] text-slate-900 selection:bg-[#A855F7] selection:text-white">
+      {/* Global Ad Manager (Non-intrusive) */}
       <AdsterraScriptManager />
 
+      {/* Main Navbar (Deep Dark Purple) */}
       <Navbar />
       
-      {/* Top Header / Navigation Leaderboard Ad Banner (All Pages) */}
-      <div className="w-full bg-white/60 border-b border-indigo-950/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <UniversalAdSlot slotId="header_banner" />
+      {/* Top Banner (hidden on live gameplay screen) */}
+      {!isGameplay && (
+        <div className="w-full bg-[#F1EFF5] border-b border-[#E5E2EC]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <UniversalAdSlot slotId="header_banner" />
+          </div>
         </div>
-      </div>
+      )}
 
       <main className="flex-1 flex flex-col relative w-full overflow-x-hidden">
         <Outlet />
       </main>
 
-      {/* Persistent Footer Ad Slot */}
-      <div className="w-full bg-white/40 border-t border-indigo-950/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <UniversalAdSlot slotId="footer_banner" />
+      {/* Footer Banner (hidden on live gameplay screen) */}
+      {!isGameplay && (
+        <div className="w-full bg-[#F1EFF5] border-t border-[#E5E2EC]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <UniversalAdSlot slotId="footer_banner" />
+          </div>
         </div>
-      </div>
+      )}
 
-      <Footer />
+      {!isGameplay && <Footer />}
       <MobileBottomNav />
       <EditProfileModal />
       <AuthModal />

@@ -1,30 +1,61 @@
 @import "tailwindcss";
 
 @theme {
-  --color-azure-50: #F0F8FF;
-  --color-azure-100: #E0F0FF;
-  --color-azure-200: #BDE0FE;
-  --color-azure-300: #90C7FE;
+  /* Primary Deep Dark Purple Palette (Navigation / Menus / Headers / Surfaces) */
+  --color-purple-primary: #090514;
+  --color-purple-secondary: #0e0720;
+  --color-purple-elevated: #160b2e;
   
-  --color-sapphire-300: #60A5FA;
-  --color-sapphire-400: #3B82F6;
-  --color-sapphire-500: #1D4ED8;
-  --color-sapphire-600: #0047AB;
-  --color-sapphire-700: #003380;
-  --color-sapphire-800: #002255;
+  --color-purple-950: #090514;
+  --color-purple-900: #0e0720;
+  --color-purple-850: #160b2e;
+  --color-purple-800: #1f0f3d;
+  --color-purple-750: #291452;
+  --color-purple-700: #381a6e;
   
-  --color-sky-400: #38BDF8;
-  --color-sky-500: #0EA5E9;
-  --color-sky-600: #0284C7;
+  /* Main Content Light Palette */
+  --color-content-white: #ffffff;
+  --color-content-soft: #f8f7fa;
+  --color-content-gray: #f1eff5;
+  --color-content-border: #e5e2ec;
+
+  /* Accent Purple */
+  --color-accent-purple: #a855f7;
+  --color-accent-purple-light: #c084fc;
+  --color-accent-purple-dark: #7c3aed;
   
-  --color-indigo-800: #1A365D;
-  --color-indigo-900: #0A2558;
-  --color-indigo-950: #071A3D;
+  /* Special Accent: Gold for rewards & currency (sparingly) */
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+
+  /* Helper aliases for UI components */
+  --color-azure-50: #f8f7fa;
+  --color-azure-100: #f1eff5;
+  --color-azure-200: #e5e2ec;
+  --color-azure-300: #a855f7;
+  
+  --color-sapphire-300: #c084fc;
+  --color-sapphire-400: #a855f7;
+  --color-sapphire-500: #9333ea;
+  --color-sapphire-600: #a855f7;
+  --color-sapphire-700: #7c3aed;
+  --color-sapphire-800: #6b21a8;
+  
+  --color-sky-400: #c084fc;
+  --color-sky-500: #a855f7;
+  --color-sky-600: #7c3aed;
+  
+  --color-indigo-800: #160b2e;
+  --color-indigo-900: #0e0720;
+  --color-indigo-950: #090514;
 }
 
 @layer base {
   body {
-    @apply bg-azure-50 text-indigo-950 font-sans antialiased;
+    @apply bg-[#f8f7fa] text-slate-900 font-sans antialiased selection:bg-[#a855f7] selection:text-white;
   }
 }
+
+
 

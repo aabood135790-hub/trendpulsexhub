@@ -149,7 +149,7 @@ export function WalletModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeWalletModal}
-            className="fixed inset-0 bg-indigo-950/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-[#090514]/75 backdrop-blur-sm"
           />
 
           {/* Modal Container */}
@@ -158,7 +158,7 @@ export function WalletModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 15 }}
             transition={{ type: 'spring', damping: 26, stiffness: 350 }}
-            className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-sapphire-600/20 max-h-[90vh] overflow-y-auto"
+            className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-[#E5E2EC] max-h-[90vh] overflow-y-auto"
           >
             {/* Close Button */}
             <button
@@ -170,54 +170,54 @@ export function WalletModal() {
             </button>
 
             {/* Glowing Accent */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-32 w-64 rounded-full bg-sky-400/20 blur-3xl pointer-events-none" />
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-32 w-64 rounded-full bg-purple-400/20 blur-3xl pointer-events-none" />
 
             {/* Header / Current Balance Hero */}
             <div className="text-center relative z-10 pt-2 pb-3">
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-sapphire-600 to-sky-400 text-white shadow-lg shadow-sapphire-600/30 border-2 border-white">
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#A855F7] to-[#C084FC] text-white shadow-lg shadow-[#A855F7]/30 border-2 border-white">
                 <Coins size={32} className="stroke-[2.5]" />
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-azure-100 text-sapphire-700 text-xs font-black uppercase tracking-wider mb-2 border border-sapphire-200">
-                <Sparkles size={12} /> Gamer Credits Wallet
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#A855F7] text-xs font-black uppercase tracking-wider mb-2 border border-purple-200">
+                <Sparkles size={12} /> Player Credits Wallet
               </div>
 
               <div className="flex items-baseline justify-center gap-2">
-                <span className="text-4xl sm:text-5xl font-black text-indigo-950 tracking-tight font-mono">
+                <span className="text-4xl sm:text-5xl font-black text-[#090514] tracking-tight font-mono">
                   {credits.toLocaleString()}
                 </span>
-                <span className="text-lg font-bold text-sapphire-600 uppercase tracking-wide">
+                <span className="text-lg font-bold text-[#A855F7] uppercase tracking-wide">
                   Credits
                 </span>
               </div>
-              <p className="text-xs sm:text-sm font-medium text-indigo-900/60 mt-1">
-                Use credits to post codes, drop screenshots, comment, and personalize your profile.
+              <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">
+                Use credits to post, drop screenshots, and personalize your player profile.
               </p>
             </div>
 
             {/* SECTION 1: Daily Reward Box vs. 12-Hour Cooldown Timer */}
             {isDailyGiftAvailable ? (
               // ACTIVE CLAIM BOX
-              <div className="my-4 rounded-2xl bg-gradient-to-r from-sapphire-900 via-indigo-950 to-sapphire-900 p-4 sm:p-5 text-white shadow-md border border-sapphire-500/30 relative overflow-hidden">
+              <div className="my-4 rounded-2xl bg-[#0E0720] p-4 sm:p-5 text-white shadow-md border border-purple-500/30 relative overflow-hidden">
                 <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3.5 text-center sm:text-left">
-                    <div className="h-12 w-12 rounded-xl bg-sky-500 text-indigo-950 flex items-center justify-center font-black shadow-md shrink-0">
+                    <div className="h-12 w-12 rounded-xl bg-[#A855F7] text-white flex items-center justify-center font-black shadow-md shrink-0">
                       <Gift size={24} className="stroke-[2.5]" />
                     </div>
                     <div>
-                      <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] font-black uppercase tracking-wider text-sky-300">
+                      <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] font-black uppercase tracking-wider text-purple-300">
                         <span>Daily Free Refill</span>
-                        <span className="bg-sky-400/20 px-1.5 py-0.5 rounded text-[10px] text-amber-300 font-bold">+100 CREDITS</span>
+                        <span className="bg-purple-400/20 px-1.5 py-0.5 rounded text-[10px] text-amber-300 font-bold">+100 CREDITS</span>
                       </div>
                       <h4 className="text-base font-black text-white">Daily Reward Box</h4>
-                      <p className="text-xs text-azure-100/80">Click to watch an ad and unlock +100 Credits instantly!</p>
+                      <p className="text-xs text-purple-200/80">Click to watch an ad and unlock +100 Credits instantly!</p>
                     </div>
                   </div>
 
                   <button
                     onClick={handleClaimRewardBox}
                     disabled={isClaiming}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-sky-400 hover:bg-sky-300 active:scale-95 text-indigo-950 font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-sky-400/30 transition-all cursor-pointer shrink-0 disabled:opacity-75"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#A855F7] hover:bg-[#9333EA] active:scale-95 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-[#A855F7]/30 transition-all cursor-pointer shrink-0 disabled:opacity-75"
                   >
                     {isClaiming ? (
                       <>
@@ -235,26 +235,26 @@ export function WalletModal() {
               </div>
             ) : (
               // 12-HOUR COUNTDOWN TIMER BOX (Claim button immediately disappeared)
-              <div className="my-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-5 text-white shadow-md border border-indigo-900/50 relative overflow-hidden">
+              <div className="my-4 rounded-2xl bg-[#0E0720] p-4 sm:p-5 text-white shadow-md border border-purple-900/50 relative overflow-hidden">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-xl bg-slate-800 border border-slate-700 text-sky-400 flex items-center justify-center font-black shadow-inner shrink-0">
+                    <div className="h-11 w-11 rounded-xl bg-purple-950/80 border border-purple-800 text-purple-400 flex items-center justify-center font-black shadow-inner shrink-0">
                       <Clock size={22} className="stroke-[2.5] animate-pulse" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-sky-300">
-                        <span className="inline-block h-2 w-2 rounded-full bg-sky-400 animate-ping" />
+                      <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-purple-300">
+                        <span className="inline-block h-2 w-2 rounded-full bg-[#A855F7] animate-ping" />
                         <span>12-Hour Cooldown</span>
                       </div>
                       <h4 className="text-sm sm:text-base font-black text-white">Daily Gift Claimed (+100)</h4>
-                      <p className="text-xs text-slate-300">Next daily gift unlocks automatically.</p>
+                      <p className="text-xs text-purple-200/70">Next daily gift unlocks automatically.</p>
                     </div>
                   </div>
 
                   {/* Countdown Display */}
                   <div className="text-right shrink-0">
                     <span className="text-[10px] font-bold text-slate-400 uppercase block">Available In</span>
-                    <div className="font-mono text-base sm:text-lg font-black text-sky-300 bg-slate-800/80 px-3 py-1 rounded-xl border border-sky-400/20 shadow-inner">
+                    <div className="font-mono text-base sm:text-lg font-black text-purple-300 bg-purple-950/80 px-3 py-1 rounded-xl border border-purple-400/20 shadow-inner">
                       {cooldown.formatted}
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export function WalletModal() {
                 {/* Progress bar */}
                 <div className="mt-3 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-[#A855F7] to-amber-400 h-full rounded-full transition-all duration-1000"
                     style={{ width: `${cooldown.progressPct}%` }}
                   />
                 </div>
@@ -282,10 +282,10 @@ export function WalletModal() {
             )}
 
             {/* SECTION 1.5: Daily Lucky Spin Wheel (24-Hour Cooldown) */}
-            <div className="my-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-2 border-amber-400/40 p-4 sm:p-5 relative overflow-hidden">
+            <div className="my-4 rounded-2xl bg-amber-500/10 border-2 border-amber-400/40 p-4 sm:p-5 relative overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5 text-center sm:text-left">
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-indigo-950 flex items-center justify-center font-black shadow-md shadow-amber-500/20 shrink-0">
+                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-[#090514] flex items-center justify-center font-black shadow-md shadow-amber-500/20 shrink-0">
                     <Trophy size={24} className="stroke-[2.5]" />
                   </div>
                   <div>
@@ -298,10 +298,10 @@ export function WalletModal() {
                         </span>
                       )}
                     </div>
-                    <h4 className="text-base font-black text-indigo-950">Daily Spin Wheel</h4>
-                    <p className="text-xs text-indigo-900/70">
+                    <h4 className="text-base font-black text-[#090514]">Daily Spin Wheel</h4>
+                    <p className="text-xs text-slate-600">
                       {isDailySpinAvailable || extraSpinTickets > 0 
-                        ? 'Your free spin is ready! Win up to 500 Credits & VIP codes.' 
+                        ? 'Your free spin is ready! Win up to 500 Credits & rewards.' 
                         : `Next free spin unlocks in ${spinCooldown.formatted}`}
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export function WalletModal() {
 
                 <button
                   onClick={handleOpenSpinWheel}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-indigo-950 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-[#090514] font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
                 >
                   <Sparkles size={16} className="stroke-[2.5]" />
                   <span>{isDailySpinAvailable || extraSpinTickets > 0 ? 'SPIN NOW' : 'VIEW WHEEL'}</span>
@@ -319,19 +319,19 @@ export function WalletModal() {
             </div>
 
             {/* SECTION 2: Redeem Code Feature */}
-            <div className="my-4 rounded-2xl bg-azure-50/80 border border-indigo-950/10 p-4 sm:p-5">
+            <div className="my-4 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] p-4 sm:p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-sapphire-600 text-white flex items-center justify-center shadow-xs">
+                  <div className="h-7 w-7 rounded-lg bg-[#A855F7] text-white flex items-center justify-center shadow-xs">
                     <KeyRound size={15} />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-black text-indigo-950 uppercase tracking-wide">
+                    <h4 className="text-xs sm:text-sm font-black text-[#090514] uppercase tracking-wide">
                       Redeem Promo / Gift Code
                     </h4>
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-sapphire-600 bg-sapphire-50 px-2 py-0.5 rounded-full border border-sapphire-200">
+                <span className="text-[11px] font-bold text-[#A855F7] bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
                   Single-Use per User
                 </span>
               </div>
@@ -349,13 +349,13 @@ export function WalletModal() {
                         setRedeemSuccessMsg(null);
                       }}
                       placeholder="Enter promo code"
-                      className="w-full bg-white border border-indigo-950/20 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-indigo-950 placeholder:font-sans placeholder:font-medium placeholder:text-indigo-900/40 uppercase tracking-wider focus:outline-none focus:border-sapphire-600 focus:ring-2 focus:ring-sapphire-600/20 pr-10"
+                      className="w-full bg-white border border-[#E5E2EC] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-[#090514] placeholder:font-sans placeholder:font-medium placeholder:text-slate-400 uppercase tracking-wider focus:outline-none focus:border-[#A855F7] focus:ring-2 focus:ring-[#A855F7]/20 pr-10"
                     />
                     <button
                       type="button"
                       onClick={handlePasteCode}
                       title="Paste from clipboard"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-indigo-900/40 hover:text-sapphire-600 p-1 rounded transition-colors cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#A855F7] p-1 rounded transition-colors cursor-pointer"
                     >
                       <ClipboardPaste size={16} />
                     </button>
@@ -364,7 +364,7 @@ export function WalletModal() {
                   <button
                     type="submit"
                     disabled={isRedeeming || !inputCode.trim()}
-                    className="flex items-center justify-center gap-1.5 bg-sapphire-600 hover:bg-sapphire-700 active:scale-95 text-white text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl shadow-md shadow-sapphire-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                    className="flex items-center justify-center gap-1.5 bg-[#A855F7] hover:bg-[#9333EA] active:scale-95 text-white text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl shadow-md shadow-[#A855F7]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                   >
                     {isRedeeming ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -404,28 +404,28 @@ export function WalletModal() {
 
             {/* SECTION 3: Credit Usage Costs Breakdown */}
             <div className="space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-black uppercase tracking-wider text-indigo-950/70 px-1">
+              <div className="flex items-center justify-between text-xs font-black uppercase tracking-wider text-slate-500 px-1">
                 <span>Rules & Usage Costs</span>
-                <span className="text-sapphire-600">Fair Play Policy</span>
+                <span className="text-[#A855F7]">Fair Play Policy</span>
               </div>
 
-              <div className="divide-y divide-indigo-950/5 rounded-2xl bg-azure-50/70 border border-indigo-950/10 p-3 sm:p-4 text-xs sm:text-sm font-semibold text-indigo-950 space-y-2">
+              <div className="divide-y divide-[#E5E2EC] rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] p-3 sm:p-4 text-xs sm:text-sm font-semibold text-[#090514] space-y-2">
                 <div className="flex items-center justify-between pt-1">
                   <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-sapphire-600" />
+                    <span className="h-2 w-2 rounded-full bg-[#A855F7]" />
                     Community Post (Text only)
                   </span>
-                  <span className="font-mono font-black text-sapphire-700 bg-white px-2 py-0.5 rounded-md border border-indigo-950/10">
+                  <span className="font-mono font-black text-[#A855F7] bg-white px-2 py-0.5 rounded-md border border-[#E5E2EC]">
                     20 Credits
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between pt-2">
                   <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-sky-500" />
+                    <span className="h-2 w-2 rounded-full bg-purple-400" />
                     Community Post with Photo / Screenshot
                   </span>
-                  <span className="font-mono font-black text-sapphire-700 bg-white px-2 py-0.5 rounded-md border border-indigo-950/10">
+                  <span className="font-mono font-black text-[#A855F7] bg-white px-2 py-0.5 rounded-md border border-[#E5E2EC]">
                     50 Credits
                   </span>
                 </div>
@@ -435,7 +435,7 @@ export function WalletModal() {
                     <span className="h-2 w-2 rounded-full bg-indigo-500" />
                     Simple Comment on Community Post
                   </span>
-                  <span className="font-mono font-black text-sapphire-700 bg-white px-2 py-0.5 rounded-md border border-indigo-950/10">
+                  <span className="font-mono font-black text-[#A855F7] bg-white px-2 py-0.5 rounded-md border border-[#E5E2EC]">
                     10 Credits
                   </span>
                 </div>
@@ -451,7 +451,7 @@ export function WalletModal() {
                         1st Change: FREE
                       </span>
                     ) : (
-                      <span className="font-mono font-black text-sapphire-700 bg-white px-2 py-0.5 rounded-md border border-indigo-950/10">
+                      <span className="font-mono font-black text-[#A855F7] bg-white px-2 py-0.5 rounded-md border border-[#E5E2EC]">
                         50 Credits
                       </span>
                     )}
@@ -464,7 +464,7 @@ export function WalletModal() {
             <div className="mt-5 flex items-center justify-end gap-3">
               <button
                 onClick={closeWalletModal}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-azure-100 hover:bg-azure-200 text-indigo-950 font-bold text-sm transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#F1EFF5] hover:bg-[#E5E2EC] text-[#090514] font-bold text-sm transition-colors cursor-pointer"
               >
                 Close
               </button>

@@ -58,6 +58,7 @@ export interface UserProfile {
   username: string;
   display_name: string;
   avatar_url: string | null;
+  age?: number;
   bio?: string;
   favorite_game?: string;
   role?: 'user' | 'moderator' | 'admin';
@@ -92,6 +93,7 @@ export interface CommunityPost {
   avatar_url: string | null;
   game_tag: string;
   category: CommunityCategory;
+  title?: string;
   content: string;
   image_url?: string | null; // Photo only
   likes_count: number;
@@ -101,4 +103,77 @@ export interface CommunityPost {
   created_at: string;
   updated_at?: string;
 }
+
+export type GameRace = 'Human' | 'Elf' | 'Dwarf' | 'Demon';
+export type GameRank = 'F' | 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS';
+
+export interface GameCharacter {
+  id: string;
+  user_id: string;
+  username: string;
+  display_name: string;
+  avatar_url?: string | null;
+  age?: number;
+  race: GameRace;
+  rank: GameRank;
+  level: number;
+  xp: number;
+  max_xp: number;
+  hp: number;
+  max_hp: number;
+  mp: number;
+  max_mp: number;
+  gold: number;
+  aura_active?: boolean;
+  house_name: string;
+  house_x: number;
+  house_y: number;
+  house_destroyed: boolean;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  facing: 'left' | 'right' | 'up' | 'down';
+  is_moving: boolean;
+  last_chat?: { message: string; timestamp: number } | null;
+  last_seen: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface TerritoryZone {
+  id: string;
+  name: string;
+  race: GameRace;
+  crystalName: string;
+  centerX: number;
+  centerY: number;
+  radius: number;
+  color: string;
+  accentColor: string;
+  description: string;
+}
+
+export interface WorldHouse {
+  id: string;
+  owner_id: string;
+  owner_username: string;
+  race: GameRace;
+  x: number;
+  y: number;
+  is_destroyed: boolean;
+}
+
+export interface GameChatMessage {
+  id: string;
+  sender_id: string;
+  sender_username: string;
+  race: GameRace;
+  rank: GameRank;
+  message: string;
+  timestamp: number;
+  x: number;
+  y: number;
+}
+
 

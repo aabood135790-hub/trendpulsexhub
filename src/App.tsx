@@ -6,10 +6,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { Home } from './pages/Home';
+import { GameLanding } from './pages/GameLanding';
+import { GamePlay } from './pages/GamePlay';
 import { CodesList } from './pages/CodesList';
 import { Community } from './pages/Community';
 import { NewsList } from './pages/NewsList';
 import { ModsList } from './pages/ModsList';
+import { Tools } from './pages/Tools';
 import { Search } from './pages/Search';
 import { DailySpin } from './pages/DailySpin';
 import { PostView } from './pages/PostView';
@@ -33,6 +36,8 @@ export default function App() {
             <Routes>
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Home />} />
+                <Route path="game" element={<GameLanding />} />
+                <Route path="game/play" element={<GamePlay />} />
                 <Route path="codes" element={<CodesList />} />
                 <Route path="codes/:slug" element={<PostView />} />
                 <Route path="community" element={<Community />} />
@@ -40,6 +45,7 @@ export default function App() {
                 <Route path="news/:slug" element={<PostView />} />
                 <Route path="mods" element={<ModsList />} />
                 <Route path="mods/:slug" element={<PostView />} />
+                <Route path="tools" element={<Tools />} />
                 <Route path="search" element={<Search />} />
                 <Route path="spin" element={<DailySpin />} />
                 <Route path="post/:slug" element={<PostView />} />

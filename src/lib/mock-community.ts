@@ -1,5 +1,65 @@
 import { CommunityPost } from '../types';
 
-// Community feed starts completely clean for real user registrations
-export const mockCommunityPosts: CommunityPost[] = [];
-
+export const mockCommunityPosts: CommunityPost[] = [
+  {
+    id: 'post_01',
+    user_id: 'usr_dragon_master',
+    username: 'IgnisDragon',
+    display_name: 'Ignis Prime',
+    avatar_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150&auto=format&fit=crop&q=80',
+    title: 'Dragonkin Pure DPS Build Guide — Level 1 to 10 Speedrun',
+    content: 'If you are playing the Dragonkin race in TrendPulseX, prioritize your burst attack speed in the open wilderness. Always retreat into the Red Crystal Safe Zone when HP drops below 30% to trigger rapid auto-heal.',
+    image_url: null,
+    category: 'Guides',
+    game_tag: 'Dragonkin',
+    likes_count: 58,
+    comments_count: 14,
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+    is_liked: false,
+    comments: [
+      {
+        id: 'comm_01',
+        post_id: 'post_01',
+        user_id: 'usr_star_mage',
+        username: 'Astraea',
+        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        content: 'Great tips! As Starborne, I usually pair with a Dragonkin frontliner for dungeon wilderness clears.',
+        created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+      },
+    ],
+  },
+  {
+    id: 'post_02',
+    user_id: 'usr_frost_tank',
+    username: 'GlacierKing',
+    display_name: 'Vanguard Glacier',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    title: 'Safe Zone Crystal Radius & Wilderness Patrol Route',
+    content: 'Just charted the complete 4-crystal safe zone borders. Remember: outside the glowing circle is the danger wilderness with PvP enabled. Stay vigilant when transporting high gold reserves back to your House!',
+    image_url: null,
+    category: 'Screenshots',
+    game_tag: 'Frostborn',
+    likes_count: 42,
+    comments_count: 8,
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+    is_liked: true,
+    comments: [],
+  },
+  {
+    id: 'post_03',
+    user_id: 'usr_shadow_ninja',
+    username: 'UmbraGhost',
+    display_name: 'Shadow Stalker',
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    title: 'Recruiting for Shadowveil Clan [NIGHTFALL]',
+    content: 'Looking for active players across all 4 races. We host daily wilderness farming squads, coordinate house defense, and share gold strategies. Drop a reply below to join the roster!',
+    image_url: null,
+    category: 'Discussions',
+    game_tag: 'Shadowveil',
+    likes_count: 31,
+    comments_count: 19,
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    is_liked: false,
+    comments: [],
+  },
+];

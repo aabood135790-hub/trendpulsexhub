@@ -182,7 +182,7 @@ export function EditProfileModal() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={closeEditProfile}
-          className="fixed inset-0 bg-indigo-950/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-[#090514]/70 backdrop-blur-sm"
         />
 
         {/* Modal Window */}
@@ -191,20 +191,20 @@ export function EditProfileModal() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onAnimationStart={handleOpen}
-          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-indigo-950/10 overflow-hidden z-10 my-8"
+          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E5E2EC] overflow-hidden z-10 my-8"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-indigo-950/10 bg-azure-50/50">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-[#E5E2EC] bg-[#F8F7FA]">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sapphire-600 text-white shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#A855F7] text-white shadow-sm">
                 <User size={18} />
               </div>
               <div>
-                <h2 className="text-lg font-black text-indigo-950">Gamer Profile & Avatar</h2>
+                <h2 className="text-lg font-black text-[#090514]">Player Profile & Avatar</h2>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs font-semibold text-indigo-900/60">Manage your identity on TrendPulseX</p>
+                  <p className="text-xs font-semibold text-slate-500">Manage your identity on TrendPulseX</p>
                   <span className={`inline-flex items-center gap-1 text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-                    isSupabaseLive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-azure-100 text-sapphire-700'
+                    isSupabaseLive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-[#F1EFF5] text-[#A855F7]'
                   }`}>
                     <ShieldCheck size={11} /> {isSupabaseLive ? 'Supabase Live' : 'Local Mode'}
                   </span>
@@ -213,7 +213,7 @@ export function EditProfileModal() {
             </div>
             <button
               onClick={closeEditProfile}
-              className="p-2 rounded-xl text-indigo-900/60 hover:text-indigo-950 hover:bg-white border border-transparent hover:border-indigo-950/10 transition-colors"
+              className="p-2 rounded-xl text-slate-400 hover:text-[#090514] hover:bg-white border border-transparent hover:border-[#E5E2EC] transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -221,13 +221,13 @@ export function EditProfileModal() {
 
           {/* Google Auth Quick Action */}
           <div className="px-6 pt-4">
-            <div className="p-3.5 rounded-2xl bg-azure-50 border border-indigo-950/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="p-3.5 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-center sm:text-left">
-                <span className="text-xs font-black text-indigo-950 block">
+                <span className="text-xs font-black text-[#090514] block">
                   {user?.email && user.email !== 'gamer@trendpulsex.com' ? `Signed in as ${user.email}` : 'Sync with Google Account'}
                 </span>
-                <span className="text-[11px] text-indigo-900/60 font-medium">
-                  {user?.email && user.email !== 'gamer@trendpulsex.com' ? 'Your cloud profile is linked' : 'Auto-sync avatar & save codes to your profile'}
+                <span className="text-[11px] text-slate-500 font-medium">
+                  {user?.email && user.email !== 'gamer@trendpulsex.com' ? 'Your cloud profile is linked' : 'Auto-sync avatar & save game stats'}
                 </span>
               </div>
               <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
@@ -244,7 +244,7 @@ export function EditProfileModal() {
                     <button
                       type="button"
                       onClick={signInWithGoogle}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-azure-100 text-indigo-950 border border-indigo-950/15 text-xs font-bold shadow-xs transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-[#F1EFF5] text-[#090514] border border-[#E5E2EC] text-xs font-bold shadow-xs transition-all cursor-pointer"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -261,7 +261,7 @@ export function EditProfileModal() {
                         closeEditProfile();
                         openAuthModal('signup');
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                     >
                       <LogIn size={13} /> Sign Up / Log In
                     </button>
@@ -286,10 +286,10 @@ export function EditProfileModal() {
             )}
 
             {/* Avatar Upload Section (PHOTO ONLY) */}
-            <div className="p-4 rounded-2xl bg-azure-50/70 border border-indigo-950/10 space-y-3">
+            <div className="p-4 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] space-y-3">
               <div className="flex flex-col sm:flex-row items-center gap-5">
                 <div className="relative group">
-                  <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-sapphire-600 shadow-md bg-white">
+                  <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-[#A855F7] shadow-md bg-white">
                     {avatarPreview ? (
                       <img
                         src={avatarPreview}
@@ -298,7 +298,7 @@ export function EditProfileModal() {
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center bg-sapphire-100 text-sapphire-700 font-black text-xl">
+                      <div className="h-full w-full flex items-center justify-center bg-purple-100 text-[#A855F7] font-black text-xl">
                         {displayName.charAt(0).toUpperCase() || 'U'}
                       </div>
                     )}
@@ -306,7 +306,7 @@ export function EditProfileModal() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-0 right-0 p-1.5 rounded-full bg-sapphire-600 text-white shadow-md hover:bg-sapphire-500 transition-colors cursor-pointer"
+                    className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#A855F7] text-white shadow-md hover:bg-[#9333EA] transition-colors cursor-pointer"
                     title="Upload photo from device"
                   >
                     <Camera size={14} />
@@ -315,20 +315,20 @@ export function EditProfileModal() {
 
                 <div className="flex-1 text-center sm:text-left space-y-1.5">
                   <div className="flex items-center justify-center sm:justify-between flex-wrap gap-2">
-                    <span className="text-xs font-black text-indigo-950 uppercase tracking-wider block">
+                    <span className="text-xs font-black text-[#090514] uppercase tracking-wider block">
                       Profile Picture (Photo Only)
                     </span>
                     {/* Dynamic Cost Rule Badge */}
                     <span className={`inline-flex items-center gap-1 font-mono text-[11px] font-black px-2 py-0.5 rounded-lg border ${
                       avatarChangesCount === 0 
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-300' 
-                        : 'bg-azure-100 text-sapphire-800 border-sapphire-300'
+                        : 'bg-purple-50 text-[#A855F7] border-purple-200'
                     }`}>
                       <Coins size={11} className="stroke-[2.5]" />
                       {avatarChangesCount === 0 ? '1st Change: FREE' : 'Update: 50 Credits'}
                     </span>
                   </div>
-                  <p className="text-xs text-indigo-900/60 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     {avatarChangesCount === 0 
                       ? 'Your first avatar change is completely free! Future updates will cost 50 credits.' 
                       : `Subsequent avatar changes cost 50 Credits. (Your Wallet: ${credits} Credits)`}
@@ -337,7 +337,7 @@ export function EditProfileModal() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
                     >
                       <Upload size={13} /> Choose Photo
                     </button>
@@ -364,7 +364,7 @@ export function EditProfileModal() {
 
             {/* Quick Presets */}
             <div>
-              <label className="block text-xs font-black text-indigo-900/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">
                 Or Choose an Instant Avatar Preset:
               </label>
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
@@ -374,7 +374,7 @@ export function EditProfileModal() {
                     type="button"
                     onClick={() => selectPresetAvatar(preset)}
                     className={`h-11 w-11 rounded-full overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                      avatarPreview === preset ? 'border-sapphire-600 scale-110 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
+                      avatarPreview === preset ? 'border-[#A855F7] scale-110 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={preset} alt={`Preset ${idx}`} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
@@ -386,26 +386,26 @@ export function EditProfileModal() {
             {/* Username & Display Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-black text-indigo-950 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-black text-[#090514] uppercase tracking-wider mb-1.5">
                   Username *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-indigo-900/40">@</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">@</span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.replace(/\s+/g, '_'))}
                     placeholder=""
                     maxLength={20}
-                    className="w-full pl-7 pr-3 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white focus:ring-2 focus:ring-sapphire-600/20"
+                    className="w-full pl-7 pr-3 py-2.5 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-bold text-[#090514] text-sm focus:border-[#A855F7] focus:bg-white focus:outline-none"
                     required
                   />
                 </div>
-                <span className="text-[10px] text-indigo-900/50 mt-1 block">Letters, numbers, and underscores</span>
+                <span className="text-[10px] text-slate-400 mt-1 block">Letters, numbers, and underscores</span>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-indigo-950 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-black text-[#090514] uppercase tracking-wider mb-1.5">
                   Display Name
                 </label>
                 <input
@@ -414,7 +414,7 @@ export function EditProfileModal() {
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder=""
                   maxLength={30}
-                  className="w-full px-3.5 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-bold text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white focus:ring-2 focus:ring-sapphire-600/20"
+                  className="w-full px-3.5 py-2.5 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-bold text-[#090514] text-sm focus:border-[#A855F7] focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
@@ -422,17 +422,17 @@ export function EditProfileModal() {
             {/* Favorite Game Selection */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-black text-indigo-950 uppercase tracking-wider">
+                <label className="block text-xs font-black text-[#090514] uppercase tracking-wider">
                   Favorite Game / Specialization
                 </label>
-                <Gamepad2 size={14} className="text-sapphire-600" />
+                <Gamepad2 size={14} className="text-[#A855F7]" />
               </div>
               <input
                 type="text"
                 value={favoriteGame}
                 onChange={(e) => setFavoriteGame(e.target.value)}
                 placeholder="e.g. Roblox Blox Fruits, Genshin Impact"
-                className="w-full px-3.5 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-medium text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white"
+                className="w-full px-3.5 py-2.5 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-medium text-[#090514] text-sm focus:border-[#A855F7] focus:bg-white focus:outline-none"
               />
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {GAME_SUGGESTIONS.slice(0, 5).map((game) => (
@@ -440,7 +440,7 @@ export function EditProfileModal() {
                     key={game}
                     type="button"
                     onClick={() => setFavoriteGame(game)}
-                    className="px-2 py-0.5 rounded-md bg-azure-100 hover:bg-azure-200 text-sapphire-800 text-[11px] font-bold transition-colors cursor-pointer"
+                    className="px-2 py-0.5 rounded-md bg-[#F1EFF5] hover:bg-purple-100 text-[#090514] text-[11px] font-bold transition-colors cursor-pointer"
                   >
                     + {game}
                   </button>
@@ -451,35 +451,35 @@ export function EditProfileModal() {
             {/* Bio */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-black text-indigo-950 uppercase tracking-wider">
-                  Gamer Bio
+                <label className="block text-xs font-black text-[#090514] uppercase tracking-wider">
+                  Player Bio
                 </label>
-                <span className="text-[11px] font-semibold text-indigo-900/50">{bio.length}/160</span>
+                <span className="text-[11px] font-semibold text-slate-400">{bio.length}/160</span>
               </div>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 maxLength={160}
-                placeholder="Share your favorite gaming builds, guild name, or what codes you hunt..."
-                className="w-full px-3.5 py-2.5 bg-azure-50 border border-indigo-950/15 rounded-xl font-medium text-indigo-950 text-sm focus:border-sapphire-600 focus:bg-white resize-none"
+                placeholder="Share your favorite gaming builds, guild name, or community thoughts..."
+                className="w-full px-3.5 py-2.5 bg-[#F8F7FA] border border-[#E5E2EC] rounded-xl font-medium text-[#090514] text-sm focus:border-[#A855F7] focus:bg-white focus:outline-none resize-none"
               />
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-indigo-950/10">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E2EC]">
               <button
                 type="button"
                 onClick={closeEditProfile}
                 disabled={isSaving}
-                className="px-4 py-2.5 rounded-xl border border-indigo-950/15 text-indigo-950 text-xs font-bold hover:bg-azure-50 transition-colors"
+                className="px-4 py-2.5 rounded-xl border border-[#E5E2EC] text-[#090514] text-xs font-bold hover:bg-[#F8F7FA] transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-sapphire-600 hover:bg-sapphire-500 text-white text-xs font-black shadow-md shadow-sapphire-600/25 transition-all disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs font-black shadow-md shadow-[#A855F7]/25 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isSaving ? (
                   <>

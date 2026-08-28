@@ -316,3 +316,107 @@ export async function uploadSupabasePhoto(
     reader.readAsDataURL(file);
   });
 }
+
+/* =========================================================================
+   4. ORIGINAL ONLINE GAME SERVICES (PULSEWORLD 2D ARENA)
+   ========================================================================= */
+
+export async function getGameCharacter(userId: string): Promise<any | null> {
+  // 1. Try server API
+  try {
+    const res = await fetch(`/api/game/character/${userId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.character) {
+        return data.character;
+      }
+    }
+  } catch (err) {
+    console.warn('[Game Service] Fetch character error:', err);
+  }
+
+  // 2. Local storage fallback
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const localChar = localStorage.getItem(`pulseworld_char_${userId}`);
+      if (localChar) {
+        return JSON.parse(localChar);
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
+export async function checkGameUsername(username: string, excludeUserId?: string): Promise<boolean> {
+  const clean = username.trim();
+  if (!clean || clean.length < 3 || clean.length > 16) return false;
+
+  try {
+    const query = excludeUserId ? `?excludeUserId=${encodeURIComponent(excludeUserId)}` : '';
+    const res = await fetch(`/api/game/check-username/${encodeURIComponent(clean)}${query}`);
+    if (res.ok) {
+      const data = await res.json();
+      return !!data.available;
+    }
+  } catch {}
+
+  return true;
+}
+
+export async function createGameCharacter(params: {
+  userId: string;
+  username: string;
+  displayName?: string;
+  race: string;
+  age?: number;
+  avatar_url?: string | null;
+}): Promise<{ success: boolean; character?: any; error?: string }> {
+  try {
+    const res = await fetch('/api/game/character', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    const data = await res.json();
+    if (data.success && data.character) {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem(`pulseworld_char_${params.userId}`, JSON.stringify(data.character));
+      }
+      return { success: true, character: data.character };
+    }
+    return { success: false, error: data.error || 'Failed to create character' };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Server connection error' };
+  }
+}
+
+export async function sendGameChatMessage(userId: string, message: string): Promise<any | null> {
+  try {
+    const res = await fetch('/api/game/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, message }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.chat || null;
+    }
+  } catch {}
+  return null;
+}
+
+export async function transferGameGold(fromUserId: string, toUserId: string, amount: number): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch('/api/game/transfer-gold', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fromUserId, toUserId, amount }),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Gold transfer failed' };
+  }
+}
+

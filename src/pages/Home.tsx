@@ -1,283 +1,362 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowRight, Flame, Sparkles, Users, Trophy, Gift, Zap } from 'lucide-react';
-import { Post } from '../types';
-import { getPosts } from '../lib/mock-data';
-import { CodeGameCard } from '../components/ui/CodeGameCard';
-import { ArticleCard } from '../components/ui/ArticleCard';
-import { BonusCodeCta } from '../components/ui/BonusCodeCta';
-import { UniversalAdSlot } from '../components/ads/UniversalAdSlot';
+import { 
+  Gamepad2, Play, Users, Sparkles, Shield, Flame, 
+  Wind, Droplets, Mountain, ArrowRight, UserCheck, MessageSquare, 
+  ChevronRight, Swords, Compass, Award, Activity
+} from 'lucide-react';
 import { usePageSEO } from '../lib/seo';
 import { useAuth } from '../context/AuthContext';
 
 export function Home() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedGameFilter, setSelectedGameFilter] = useState('All');
+  const { isAuthenticated, openAuthModal, profile } = useAuth();
+  const [onlineCount, setOnlineCount] = useState(148);
 
   usePageSEO({
-    title: 'Working Game Codes, Free Rewards & Gaming News',
-    description: 'Discover daily verified working promo codes, free rewards, and breaking update leaks for Roblox Blox Fruits, Fisch, Blade Ball, and more at TrendPulseXhub.com.',
-    keywords: 'roblox codes, blox fruits codes, fisch codes, blade ball codes, working promo codes 2026, free rewards',
+    title: 'TrendPulseX | Enter The World - Original 2D Online Game & Community',
+    description: 'Enter the world of TrendPulseX: Play the original 2D online multiplayer game with real-time combat, four elemental races, safe zones, and connect with the player community.',
+    keywords: 'trendpulsex, online 2d game, pulseworld, multiplayer browser game, player community, dark fantasy rpg',
   });
 
   useEffect(() => {
-    async function load() {
-      const data = await getPosts();
-      setPosts(data);
-      setLoading(false);
-    }
-    load();
+    // Dynamic simulated active player counter
+    const interval = setInterval(() => {
+      setOnlineCount(prev => Math.max(120, prev + Math.floor(Math.random() * 5) - 2));
+    }, 8000);
+    return () => clearInterval(interval);
   }, []);
 
-  const allCodePosts = posts.filter(p => p.category === 'Codes');
-  const filteredCodePosts = selectedGameFilter === 'All'
-    ? allCodePosts.slice(0, 8)
-    : allCodePosts.filter(p => p.title.toLowerCase().includes(selectedGameFilter.toLowerCase()) || p.codes_data?.some(c => c.game.toLowerCase().includes(selectedGameFilter.toLowerCase()))).slice(0, 8);
-
-  const newsPosts = posts.filter(p => p.category === 'News').slice(0, 3);
-  const modPosts = posts.filter(p => p.category === 'Mods').slice(0, 2);
-
-  const ROBLOX_POPULAR_GAMES = [
-    'All',
-    'Blox Fruits',
-    'Fisch',
-    'Blade Ball',
-    'Anime Vanguards',
-    'Anime Defenders',
-    'King Legacy',
-    'Pet Simulator 99',
-    'All Star Tower Defense',
+  const RACES = [
+    {
+      name: 'Dragonkin',
+      element: 'Infernal Fire',
+      icon: Flame,
+      color: 'bg-white border-[#E5E2EC] hover:border-amber-400/80',
+      badgeBg: 'bg-amber-50 text-amber-700 border-amber-200',
+      badge: 'Aggressive / High DPS',
+      desc: 'Forged in volcanic depths with enhanced attack speed and searing burst damage.',
+    },
+    {
+      name: 'Starborne',
+      element: 'Celestial Arcane',
+      icon: Sparkles,
+      color: 'bg-white border-[#E5E2EC] hover:border-purple-400/80',
+      badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
+      badge: 'High Mana / Teleport',
+      desc: 'Channels cosmic starlight with expansive mana pools and mystic mobility.',
+    },
+    {
+      name: 'Shadowveil',
+      element: 'Abyssal Umbra',
+      icon: Wind,
+      color: 'bg-white border-[#E5E2EC] hover:border-indigo-400/80',
+      badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      badge: 'Stealth / Critical',
+      desc: 'Masters of the dark wilderness with lightning agility and evasive maneuvers.',
+    },
+    {
+      name: 'Frostborn',
+      element: 'Glacial Ice',
+      icon: Droplets,
+      color: 'bg-white border-[#E5E2EC] hover:border-cyan-400/80',
+      badgeBg: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+      badge: 'High HP / Defense',
+      desc: 'Armored in crystalline permafrost with maximum health reserves and resilience.',
+    },
   ];
 
   return (
-    <div className="w-full pb-20 md:pb-0">
-      {/* Premium Hero Section */}
-      <section className="relative overflow-hidden bg-indigo-950 pt-20 pb-24 md:pt-32 md:pb-36 px-4 sm:px-6 lg:px-8">
-        {/* Cinematic Background Elements */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80&w=2000')] opacity-10 bg-cover bg-center mix-blend-overlay" />
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-sapphire-600/30 to-transparent blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-tr from-sky-500/20 to-transparent blur-3xl" />
-        </div>
+    <div className="w-full bg-[#F8F7FA] text-slate-900 min-h-screen">
+      
+      {/* 1. HERO SECTION: GAME-FIRST FOCUSED PRESENTATION */}
+      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 lg:px-8 border-b border-[#E5E2EC] bg-[#F8F7FA]">
         
-        <div className="relative z-10 mx-auto max-w-7xl flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 mb-6 backdrop-blur-md"
-          >
-            <Flame size={16} className="text-sky-400" />
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-300">Daily Verified Rewards</span>
-          </motion.div>
+        {/* Subtle geometric dot pattern */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/30 rounded-full blur-[140px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(#a855f7_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-5xl text-center space-y-8">
           
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tight drop-shadow-lg max-w-4xl"
-          >
-            Unlock More. <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-azure-100 via-sky-300 to-sapphire-400">Play Smarter.</span>
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-6 text-lg md:text-xl font-medium text-azure-50/85 max-w-2xl"
-          >
-            Discover the latest gaming promo codes, active rewards, breaking news, and curated mods — hand-curated and updated daily.
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-          >
-            <Link to="/codes" className="flex h-14 items-center justify-center rounded-xl bg-sapphire-600 px-8 text-base font-black text-white transition-all hover:scale-105 hover:bg-sapphire-500 shadow-[0_0_25px_rgba(0,71,171,0.5)] border border-sky-400/30">
-              Explore Promo Codes Hub
+          {/* Top Brand Pill & Live Status */}
+          <div className="inline-flex items-center gap-3 rounded-full border border-[#E5E2EC] bg-white px-4 py-1.5 shadow-sm">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-black uppercase tracking-wider text-[#090514] font-mono">
+              TrendPulseX Realm Live
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="text-xs font-bold text-purple-700 font-mono flex items-center gap-1">
+              <Activity size={12} className="text-[#A855F7]" />
+              {onlineCount} Online Players
+            </span>
+          </div>
+
+          {/* Main Title & Slogan */}
+          <div className="space-y-4">
+            <h2 className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#A855F7] font-mono">
+              TREND PULSEX
+            </h2>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-[#090514] leading-tight">
+              ENTER THE WORLD
+            </h1>
+            <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+              An original 2D online multiplayer browser game. Real-time exploration, smooth non-grid movement, four elemental races, safe zones, and open wilderness combat.
+            </p>
+          </div>
+
+          {/* Hero CTAs */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+            <Link
+              to="/game/play"
+              id="hero-play-now-btn"
+              className="w-full sm:w-auto flex-1 flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-[#A855F7] hover:bg-[#9333EA] text-white font-black text-base sm:text-lg shadow-xl shadow-[#A855F7]/30 transition-all hover:scale-105 active:scale-95 border border-[#C084FC]/30 cursor-pointer"
+            >
+              <Play size={20} className="fill-white" />
+              <span>PLAY NOW</span>
             </Link>
-            <Link to="/news" className="flex h-14 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20 px-8 text-base font-bold text-white transition-all hover:bg-white/20">
-              Read Gaming News
+
+            <Link
+              to="/community"
+              id="hero-community-btn"
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white hover:bg-[#F1EFF5] text-[#090514] font-bold text-base border border-[#E5E2EC] shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <Users size={18} className="text-[#A855F7]" />
+              <span>COMMUNITY</span>
             </Link>
-          </motion.div>
+          </div>
+
+          {/* Core Feature Badges */}
+          <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
+            <div className="p-3.5 rounded-2xl bg-white border border-[#E5E2EC] shadow-xs">
+              <span className="text-[10px] font-bold text-[#A855F7] block uppercase font-mono">Movement</span>
+              <span className="text-xs sm:text-sm font-black text-[#090514]">Smooth 2D Controls</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-[#E5E2EC] shadow-xs">
+              <span className="text-[10px] font-bold text-amber-600 block uppercase font-mono">Territories</span>
+              <span className="text-xs sm:text-sm font-black text-[#090514]">4 Crystal Safe Zones</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-[#E5E2EC] shadow-xs">
+              <span className="text-[10px] font-bold text-[#A855F7] block uppercase font-mono">Multiplayer</span>
+              <span className="text-xs sm:text-sm font-black text-[#090514]">Real-Time Sync</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-white border border-[#E5E2EC] shadow-xs">
+              <span className="text-[10px] font-bold text-amber-600 block uppercase font-mono">Accounts</span>
+              <span className="text-xs sm:text-sm font-black text-[#090514]">Persistent Gold & Rank</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 space-y-20 md:space-y-28">
-        {/* Trending Roblox Game Codes Cards Section */}
-        <section>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-            <div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="text-sapphire-600" size={20} />
-                <h2 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tight">Trending Roblox Codes</h2>
-              </div>
-              <p className="text-sm font-semibold text-indigo-900/50 mt-1">Select an experience below to view verified active codes & rewards</p>
-            </div>
-            <Link to="/codes" className="hidden sm:flex items-center text-sm font-bold text-sapphire-600 hover:text-sapphire-500 transition-colors gap-1">
-              View All Roblox Games <ArrowRight size={16} />
-            </Link>
+      {/* 2. SHORT EXPLANATION OF THE GAME & 4 RACES */}
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-[#E5E2EC] bg-white">
+        <div className="mx-auto max-w-6xl space-y-12">
+          
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#A855F7] font-mono">
+              THE WORLD OF TRENDPULSEX
+            </h2>
+            <h3 className="text-2xl sm:text-4xl font-black text-[#090514] tracking-tight">
+              Choose Your Race & Conquer The Realm
+            </h3>
+            <p className="text-sm text-slate-600 font-medium leading-relaxed">
+              Step into an expansive open world featuring four elemental sanctuary crystals, player houses, real-time proximity chat, and dangerous wilderness territories.
+            </p>
           </div>
 
-          {/* Quick Roblox Filter Chips */}
-          <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {ROBLOX_POPULAR_GAMES.map((gameName) => {
-              const isActive = selectedGameFilter === gameName;
+          {/* 4 Races Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {RACES.map((race) => {
+              const Icon = race.icon;
               return (
-                <button
-                  key={gameName}
-                  onClick={() => setSelectedGameFilter(gameName)}
-                  className={`whitespace-nowrap rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-sapphire-600 text-white shadow-md shadow-sapphire-600/25 scale-105'
-                      : 'bg-white text-indigo-950/70 border border-indigo-950/10 hover:bg-azure-50 hover:text-sapphire-600'
-                  }`}
+                <div
+                  key={race.name}
+                  className={`p-5 rounded-2xl ${race.color} border shadow-sm flex flex-col justify-between space-y-4 transition-all hover:-translate-y-1 hover:shadow-md`}
                 >
-                  {gameName === 'All' ? 'All Roblox' : gameName}
-                </button>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-10 w-10 rounded-xl bg-[#F8F7FA] border border-[#E5E2EC] flex items-center justify-center text-[#A855F7]">
+                        <Icon size={20} />
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${race.badgeBg}`}>
+                        {race.badge}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg font-black text-[#090514]">{race.name}</h4>
+                      <span className="text-xs font-bold text-slate-500 font-mono">{race.element}</span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {race.desc}
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/game/play"
+                    className="pt-2 flex items-center gap-1.5 text-xs font-bold text-[#A855F7] hover:text-[#9333EA] transition-colors"
+                  >
+                    <span>Play as {race.name}</span>
+                    <ChevronRight size={14} />
+                  </Link>
+                </div>
               );
             })}
           </div>
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="animate-pulse bg-white rounded-2xl h-80 border border-indigo-950/10" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCodePosts.map((post) => (
-                <CodeGameCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
 
-          <div className="mt-6 sm:hidden">
-            <Link to="/codes" className="flex h-12 w-full items-center justify-center rounded-xl bg-azure-100 text-sm font-bold text-sapphire-700 hover:bg-azure-200 transition-colors">
-              View All Roblox Codes Vault →
-            </Link>
-          </div>
-        </section>
-
-        {/* Daily Lucky Spin Wheel Spotlight Section */}
-        <section className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-10 border-2 border-amber-400/40 shadow-2xl text-white">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 h-64 w-64 rounded-full bg-sky-500/20 blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div className="space-y-3 max-w-2xl text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-black uppercase tracking-wider">
-                <Flame size={14} className="text-amber-400" />
-                <span>New Feature • 24-Hour Cooldown</span>
+          {/* Game Pillar Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+            <div className="p-6 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] space-y-3 shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-purple-100 text-[#A855F7] flex items-center justify-center">
+                <Shield size={20} />
               </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                Daily Lucky <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-white">Spin Wheel</span>
-              </h2>
-              <p className="text-sm sm:text-base text-azure-100/85 leading-relaxed font-medium">
-                Spin once every 24 hours to score free Gamer Credits, exclusive VIP promo codes, and 2X double bonus drops directly into your wallet balance.
-              </p>
-
-              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-bold text-sky-200">
-                <span className="flex items-center gap-1.5 bg-indigo-900/60 px-3 py-1.5 rounded-xl border border-sky-400/20">
-                  <Trophy size={14} className="text-amber-400" /> Grand Jackpot: 500 Credits
-                </span>
-                <span className="flex items-center gap-1.5 bg-indigo-900/60 px-3 py-1.5 rounded-xl border border-sky-400/20">
-                  <Zap size={14} className="text-sky-400" /> 2X Double Bonus Multipliers
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
-              <Link
-                to="/spin"
-                className="flex items-center gap-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-indigo-950 px-8 py-4 rounded-2xl font-black text-sm md:text-base shadow-[0_0_30px_rgba(245,158,11,0.5)] border border-amber-300/60 transition-all hover:scale-105 active:scale-95"
-              >
-                <Sparkles size={18} className="stroke-[2.5]" />
-                <span>SPIN THE WHEEL NOW</span>
-                <ArrowRight size={18} strokeWidth={2.5} />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Community Feed Spotlight */}
-        <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-azure-100/70 via-white to-azure-50 p-6 sm:p-10 border border-sapphire-600/20 shadow-lg">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sapphire-600/10 text-sapphire-700 text-xs font-black uppercase tracking-wider">
-                <Users size={13} /> The Community Hub
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 tracking-tight">
-                Connect, Share Codes & Post In-Game Photos
-              </h2>
-              <p className="text-sm font-medium text-indigo-900/70 leading-relaxed">
-                Join thousands of gamers sharing instant code redemption screenshots, raid loadouts, and secret game drops in real-time.
+              <h4 className="text-base font-black text-[#090514]">4 Crystal Safe Zones</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Regenerate HP & MP instantly inside sanctified crystal rings. Rest, customize your appearance, chat with allies, and trade peacefully.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
-              <Link
-                to="/community"
-                className="flex items-center gap-2 bg-sapphire-600 hover:bg-sapphire-500 text-white px-6 py-3.5 rounded-2xl font-black text-sm shadow-md shadow-sapphire-600/25 transition-all hover:scale-105"
-              >
-                <Users size={16} /> Enter Community Feed <ArrowRight size={16} />
-              </Link>
+            <div className="p-6 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] space-y-3 shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                <Swords size={20} />
+              </div>
+              <h4 className="text-base font-black text-[#090514]">Wilderness & Combat</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Venture past the crystal boundaries into uncharted open wilderness. Engage monsters, defeat opponents, earn Gold, and climb the Leaderboards.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#F8F7FA] border border-[#E5E2EC] space-y-3 shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-purple-100 text-[#A855F7] flex items-center justify-center">
+                <Compass size={20} />
+              </div>
+              <h4 className="text-base font-black text-[#090514]">Player Houses & Progression</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Own personal player houses across the map. Level up your character, upgrade ranks, and unlock exclusive titles and combat auras.
+              </p>
             </div>
           </div>
-        </section>
 
-        {/* Adsterra / Sponsor Bonus Reward CTA */}
-        <section className="space-y-6">
-          <BonusCodeCta />
-          <UniversalAdSlot slotId="home_feed_banner" />
-        </section>
+        </div>
+      </section>
 
-        {/* Latest News */}
-        <section>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tight">Latest Intel</h2>
-            <Link to="/news" className="hidden sm:flex items-center text-sm font-bold text-sapphire-600 hover:text-sapphire-500 transition-colors gap-1">
-              All News <ArrowRight size={16} />
-            </Link>
-          </div>
+      {/* 3. COMMUNITY PILLAR SECTION (High-Contrast Anchor Card) */}
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-[#E5E2EC] bg-[#F8F7FA]">
+        <div className="mx-auto max-w-5xl">
           
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1,2,3].map(i => (
-                <div key={i} className="animate-pulse bg-white rounded-2xl h-80 border border-indigo-950/10" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newsPosts.map((post, i) => (
-                <ArticleCard key={post.id} post={post} featured={i === 0} />
-              ))}
-            </div>
-          )}
-        </section>
+          <div className="rounded-3xl bg-[#0E0720] p-8 sm:p-12 border border-[#160B2E] shadow-2xl relative overflow-hidden text-white">
+            
+            {/* Ambient Purple Glow */}
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-[#A855F7]/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-[#FBBF24]/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Mods Preview */}
-        <section>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tight">Featured Mods</h2>
-            <Link to="/mods" className="hidden sm:flex items-center text-sm font-bold text-sapphire-600 hover:text-sapphire-500 transition-colors gap-1">
-              Browse Mods <ArrowRight size={16} />
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#160B2E] border border-[#A855F7]/30 text-[#C084FC] text-xs font-bold uppercase tracking-wider font-mono">
+                  <Users size={13} className="text-[#C084FC]" /> The Player Community
+                </div>
+                
+                <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+                  Connect With Fellow Players & Share Strategies
+                </h3>
+                
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                  Join discussions, recruit clan members, share boss fight discoveries, post gameplay clips, and build your reputation across the TrendPulseX community.
+                </p>
+
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
+                  <Link
+                    to="/community"
+                    id="community-feed-cta"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold text-sm shadow-md shadow-[#A855F7]/30 transition-all hover:scale-105 active:scale-95 border border-[#C084FC]/30"
+                  >
+                    <span>EXPLORE COMMUNITY</span>
+                    <ArrowRight size={16} />
+                  </Link>
+
+                  {!isAuthenticated && (
+                    <button
+                      onClick={() => openAuthModal('signup')}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#160B2E] hover:bg-[#1F0F3D] text-[#C084FC] hover:text-white font-bold text-sm border border-[#A855F7]/30 transition-all cursor-pointer"
+                    >
+                      <UserCheck size={16} className="text-[#FBBF24]" />
+                      <span>Create Account</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Community Preview Card */}
+              <div className="lg:col-span-5 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#160B2E]/90 border border-[#1F0F3D] space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-full bg-[#A855F7] text-white flex items-center justify-center text-xs font-black">
+                      S
+                    </div>
+                    <div>
+                      <span className="text-xs font-black text-white block leading-tight">Starborne_Mage</span>
+                      <span className="text-[10px] font-bold text-[#C084FC] font-mono">Rank 4 • Celestial</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    "Discovered a hidden loot chest near the North-East Glacial safe zone border. Watch out for wilderness patrol!"
+                  </p>
+                  <div className="flex items-center gap-3 text-[10px] font-mono text-slate-400 pt-1 border-t border-[#1F0F3D]">
+                    <span>❤️ 24 Likes</span>
+                    <span>💬 9 Replies</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#160B2E]/60 border border-[#1F0F3D] space-y-2.5 opacity-80">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs font-black">
+                      D
+                    </div>
+                    <div>
+                      <span className="text-xs font-black text-white block leading-tight">DragonSlayer_99</span>
+                      <span className="text-[10px] font-bold text-[#FBBF24] font-mono">Rank 6 • Dragonkin</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    "Recruiting 3 active warriors for tonight's wilderness raid. Drop a comment below to join the squad."
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 4. PERSISTENT ACCOUNT BANNER */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white border-t border-[#E5E2EC]">
+        <div className="mx-auto max-w-4xl text-center space-y-4">
+          <h4 className="text-xs font-black uppercase tracking-widest text-[#A855F7] font-mono">
+            ONE UNIFIED ACCOUNT
+          </h4>
+          <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto font-medium">
+            Your Google or email account syncs across both <strong>🎮 The Game</strong> and <strong>👥 The Community</strong>. Keep your character level, gold, rank, and posts permanently.
+          </p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <Link
+              to="/game/play"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-xs sm:text-sm font-black shadow-lg shadow-[#A855F7]/30 border border-[#C084FC]/30 transition-all hover:scale-105"
+            >
+              <Play size={14} className="fill-white" />
+              <span>LAUNCH GAME NOW</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {modPosts.map(post => (
-              <ArticleCard key={post.id} post={post} />
-            ))}
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
     </div>
   );
 }
-
